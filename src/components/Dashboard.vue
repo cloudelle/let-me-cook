@@ -10,7 +10,7 @@ import { getUsers } from '../firebase.js'
   <br>
   <input type="password">
   <br>
-  <button v-on:click="SubmitEvent()"></button>
+  <button>Register</button>
   
 
 
