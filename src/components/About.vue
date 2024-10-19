@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!-- test -->
       <h1>Trending Recipes</h1>
       <button @click="signOutUser">Sign Out</button>
       <div id="recipe-list">
