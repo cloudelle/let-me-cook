@@ -95,31 +95,32 @@ export const login = (event) => {
 
 }
 
-// export async function getUserInfoById(uid) {
+export async function  getUserInfoById(uid) {
 
-//     const docRef = doc(db, "user", uid);
-//     const docSnap = await getDoc(docRef);
+    const docRef = doc(db, "user", uid);
+    const docSnap = await getDoc(docRef);
 
-//     if (docSnap.exists()) {
-//         console.log("Document data:", docSnap.data());
-//     } else {
-//         // docSnap.data() will be undefined in this case
-//         console.log("No such document!");
-//     }
+    if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+    } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+    }
 
-// }
+}
 
-// onAuthStateChanged(auth, (user) => {
-//     if (user) {
-//         // User is signed in, see docs for a list of available properties
-//         console.log(user.uid, "line 101")
-//         const uid = user.uid;
-//         return uid
-//         // ...
-//     } else {
-//         // User is signed out
-//         // ...
-//         alert("You need to login")
-//         router.push('register')
-//     }
-// });
+onAuthStateChanged (auth, (user) => {
+    if (user) {
+        // User is signed in, see docs for a list of available properties
+        console.log(user.uid, "line 101")
+        const uid = user.uid;
+        return uid
+        // ...
+    } else {
+        // User is signed out
+        // ...
+        alert("You need to login")
+        router.push('register')
+        return false
+    }
+});
