@@ -1,4 +1,22 @@
 <template>
+  
+  <div class="w-screen px-6 md:px-8 relative">
+  <img class="w-full h-[400px] rounded-xl" src="../../images/about-image.jpg">
+  
+  <!-- Text overlaying the image -->
+  <div class="absolute top-0 left-0">
+    <h1 class="relative ml-4 mt-[90px] mb-4 text-4xl font-extrabold text-tomato 
+      sm:ml-[60px] sm:mt-[100px] sm:text-5xl 
+      md:ml-[80px] md:mt-[120px] md:text-6xl 
+      lg:ml-[200px] lg:mt-[120px] lg:text-7xl">
+      About <br>
+      LetMeCook!
+    </h1>
+    
+  </div>
+</div>
+
+
     <div>
         <!-- test -->
       <h1>Trending Recipes</h1>
@@ -28,7 +46,8 @@
   const router = useRouter(); // Initialize the router
   
   // API key and URL for Spoonacular API
-  const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key
+//   const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key
+  const apiKey = "1abba8626fd54b82832a789925a3c6d5"; // yen qin Spoonacular API key
   const numberOfRecipes = 10; // Number of recipes to display
   const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`;
   
