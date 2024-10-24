@@ -27,6 +27,7 @@ const user = auth.currentUser;
 
 
 export { auth }
+export {db,app}
 
 // Get list of users from database
 export async function getUsers() {
@@ -131,7 +132,6 @@ export async function getTrendingRecipes(apiUrl) {
 export const signOutUser = (uid) => {
     signOut(auth).then(() => {
         // Sign-out successful.
-        router.push('/login');
         console.log("Sign-out successful");
         uid = ""; // Clear the uid after signing out
     }).catch((error) => {

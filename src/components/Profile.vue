@@ -38,7 +38,7 @@
   onMounted(() => {
       onAuthStateChanged(auth, (user) => {
           if (!user) {
-              alert("You need to login");
+              // alert("You need to login");
               // Optionally navigate to the login or register page if needed
               router.push('/login')
           }

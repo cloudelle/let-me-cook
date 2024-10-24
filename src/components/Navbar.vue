@@ -1,5 +1,12 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from 'vue-router';
+import { signOutUser } from '../firebase.js'
+
+const auth = getAuth();
+const isLoggedIn = ref(false);
+const uid = ref(""); // Define uid as a reactive reference
 
 // Reactive state for menu visibility
 const isMenuOpen = ref(false);
@@ -8,6 +15,13 @@ const isMenuOpen = ref(false);
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
+
+onMounted(() => {
+  onAuthStateChanged(auth, (user) => {
+    isLoggedIn.value = !!user; // Set to true if user is signed in, false otherwise
+  });
+});
+
 </script>
 
 <template>
@@ -28,19 +42,27 @@ const toggleMenu = () => {
        <div :class="isMenuOpen ? 'block' : 'hidden'" class="w-full md:block md:w-auto mx-auto" id="navbar-default">
       <!-- <div class="hidden w-full md:block md:w-auto mx-auto" id="navbar-default"> -->
         <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-          <li>
+          <li v-if="!isLoggedIn">
               <router-link to="/register" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">Register</router-link>
           </li>
-          <li>
-              <router-link v-if='!onAuthStateChanged' to="/login" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
+          <li v-if="!isLoggedIn">
+              <router-link to="/login" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">Login</router-link>
           </li>
-          <li>
+          <li v-if="isLoggedIn">
               <router-link to="/Dashboard" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">Dashboard</router-link>
           </li>
-          <li>
+          <li v-if="isLoggedIn">
+              <router-link to="/Profile" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
+              exact-active-class="text-tomato">Profile</router-link>
+          </li>
+          <li v-if="isLoggedIn">
+              <router-link to="/login" v-on:click="signOutUser(uid)" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
+              exact-active-class="text-tomato">Sign Out</router-link>
+          </li>
+          <!-- <li>
               <router-link to="/" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">About</router-link>
           </li>
@@ -55,16 +77,7 @@ const toggleMenu = () => {
           <li>
               <router-link to="/" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">Leaderboard</router-link>
-          </li>
-
-          <!-- <li>
-            <router-link to="/">
-              <button type="button" class="text-gray-900 bg-green-100 hover:bg-green-200 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" active-class="text-red-600"
-              exact-active-class="text-red-600">Get Started!</button>
-            </router-link>
-
           </li> -->
-
         </ul>
       </div>
           
