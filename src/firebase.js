@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { ref } from "vue";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDoc,getDocs, setDoc, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, getDoc, getDocs, setDoc, addDoc, doc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import router from "./router";
 
@@ -25,6 +25,7 @@ const auth = getAuth(app);
 const user = auth.currentUser;
 
 
+
 export { auth }
 
 // Get list of users from database
@@ -40,9 +41,11 @@ export async function getUsers() {
 export const name = ref("");
 export const email = ref("");
 export const password = ref("");
-
 export const loginEmail = ref("");
 export const loginPassword = ref("");
+export const recipes = ref([]);
+export const error = ref("");
+
 
 //register new user into firebase auth
 export const register = (event) => {
@@ -95,7 +98,7 @@ export const login = (event) => {
 
 }
 
-export async function  getUserInfoById(uid) {
+export async function getUserInfoById(uid) {
 
     const docRef = doc(db, "user", uid);
     const docSnap = await getDoc(docRef);
@@ -109,18 +112,30 @@ export async function  getUserInfoById(uid) {
 
 }
 
-onAuthStateChanged (auth, (user) => {
-    if (user) {
-        // User is signed in, see docs for a list of available properties
-        console.log(user.uid, "line 101")
-        const uid = user.uid;
-        return uid
-        // ...
-    } else {
-        // User is signed out
-        // ...
-        alert("You need to login")
-        router.push('register')
-        return false
+// Function to fetch recipes from Spoonacular API
+export async function getTrendingRecipes(apiUrl) {
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        recipes.value = data.results; // Store the fetched recipes in reactive state
+    } catch (err) {
+        console.error("Error fetching the recipes:", err);
+        error.value = "Failed to fetch recipes."; // Set error message
     }
-});
+}
+
+
+export const signOutUser = (uid) => {
+    signOut(auth).then(() => {
+        // Sign-out successful.
+        router.push('/login');
+        console.log("Sign-out successful");
+        uid = ""; // Clear the uid after signing out
+    }).catch((error) => {
+        // An error happened.
+        console.log("Error signing out:", error);
+    });
+};

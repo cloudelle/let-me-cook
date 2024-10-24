@@ -17,4 +17,5 @@ import { email, password, register, name} from '../firebase.js';
 </template>
 
 <style scoped>
+
 </style>

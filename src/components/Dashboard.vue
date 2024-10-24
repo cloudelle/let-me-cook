@@ -6,22 +6,20 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 
-
-const uid = ref(null); // reactive state to store the user's uid
+const uid = ref(""); // reactive state to store the user's uid
 const router = useRouter();
 
 onMounted(() => {
-  // Firebase listener to track auth state
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is signed in, store the uid
-      uid.value = user.uid;
+        // User is signed in, see docs for a list of available properties
+        uid.value = user.uid; // Update the reactive uid
+        // ...
     } else {
-      // User is signed out, navigate to login page
-      alert("You need to login");
-      router.push("/login");
+        // User is signed out
+        router.push('login')
     }
-  });
+});
 });
 
 </script>
