@@ -55,6 +55,10 @@ onMounted(() => {
               exact-active-class="text-tomato">Dashboard</router-link>
           </li>
           <li v-if="isLoggedIn">
+              <router-link to="/start" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
+              exact-active-class="text-tomato">Start</router-link>
+          </li>
+          <li v-if="isLoggedIn">
               <router-link to="/Profile" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-tomato md:p-0" active-class="text-tomato"
               exact-active-class="text-tomato">Profile</router-link>
           </li>

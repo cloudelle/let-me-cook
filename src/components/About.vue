@@ -7,7 +7,8 @@ import { useRouter } from 'vue-router'; // Import useRouter
 const router = useRouter(); // Initialize the router
 
 // API key and URL for Spoonacular API
-const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key
+//const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key
+const apiKey = "f88baf2ecf9a4eab92a25613785c4ba1";
 const numberOfRecipes = 1; // Number of recipes to display
 const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`;
 

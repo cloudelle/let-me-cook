@@ -4,6 +4,7 @@ import Dashboard from "../components/Dashboard.vue"
 import Register from "../components/Register.vue"
 import Login from "../components/Login.vue"
 import Profile from "../components/Profile.vue"
+import Start from "../components/Start.vue"
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
+  },
+  {
+    path: "/start",
+    name: "Start",
+    component: Start,
   },
 ]
 
