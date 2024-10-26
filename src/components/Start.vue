@@ -74,9 +74,13 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
         selectedIngredients: [], // List of selected ingredients
         suggestedIngredients: [], // API suggested ingredients
         fetchIngredientsTimer: null, // Timer for debouncing
-        apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+        //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+        //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+        apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
         numberOfRecipes: 3, // Number of recipes to display
         recipes: [],
+        documentId: null,
+        loadingData: true
         // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
  
       };
@@ -123,12 +127,48 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
         console.log(response.data.results)
         this.recipes = response.data.results
         //why isnt this updating wtf
-        // console.log(getDocs(collection(db,"ingredients")))
+        // this.getDocumentId()
         })
       .catch(error => {
         console.log(error.message)
       })
     },
+      async getDocumentId() {
+      try {
+        // Get all documents in the "ingredients" collection
+        const querySnapshot = await getDocs(collection(db, "ingredients"));
+        console.log(querySnapshot.docs[0])
+        this.documentId = querySnapshot.docs[0].id;
+        console.log("Document ID: ", this.documentId);
+        const docRef = doc(db, "ingredients", this.documentId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            this.loadingData = true; // Set loading flag to true
+            this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
+            this.loadingData = false; // Set loading flag to false after update
+        }
+
+        // Loop through each document and extract the ID
+          // Assuming you want the first document, you can store its ID
+          // this.fetchDocumentData()
+
+      } catch (e) {
+        console.error("Error getting document ID: ", e);
+      }
+    },
+    // async fetchDocumentData() {
+    //     const docRef = doc(db, "ingredients", this.documentId);
+    //     const docSnap = await getDoc(docRef);
+    //     if (docSnap.exists()) {
+    //         const data = docSnap.data();
+    //         this.loadingData = true; // Set loading flag to true
+    //         this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
+    //         this.loadingData = false; // Set loading flag to false after update
+    //     } else {
+    //         console.log("No such document with ID:", id);
+    //     }
+    //   }
     // fetchRecipeScore(recipeId) {
     //   const recipeInfo = `https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${this.apiKey}`
     //   axios.get(recipeInfo)
@@ -142,16 +182,19 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
     // }
     },
     watch: {
-    selectedIngredients: {
-      handler() {
-        this.fetchRecipes(); // Fetch recipes when ingredients change
-      },
-      deep: true,
-      immediate: true, // Run fetchRecipes initially on component mount
+  selectedIngredients: {
+    handler() {
+      if (!this.loadingData) { // Check if not in loading phase
+        this.fetchRecipes();
+      }
     },
+    deep: true,
+    immediate: true,
   },
+},
+
     mounted() {
-      this.fetchRecipes()
+      this.getDocumentId()
     }
   };
   </script>
