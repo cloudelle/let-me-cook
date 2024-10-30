@@ -5,13 +5,12 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase.js';
 import { useRouter } from "vue-router";
 import { app, db } from '../firebase';
-import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } from 'firebase/firestore';
 </script>
 
 
 <template>
-      <!-- Dropdown to select ingredients -->
-      <div>
+  <div>
     <!-- Input for typing ingredients -->
     <label for="ingredient-input">Type Ingredient:</label>
     <input v-model="typedIngredient" @input="fetchIngredientsDebounced" id="ingredient-input" />
@@ -29,66 +28,68 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
       <ul>
         <li v-for="(ingredient, index) in selectedIngredients" :key="index">
           {{ ingredient }}
-          <button @click="removeIngredient(index)">X</button>
+          <button @click="removeIngredient(ingredient,index)">X</button>
         </li>
       </ul>
     </div>
   </div>
 
-    <div id="recipe-list">
-      <h1>CHALLENGES</h1>
-      <div v-for="recipe in recipes" :key="recipe.id" class="recipe">
-          <img :src="recipe.image" :alt="recipe.title" />
-          <div class="recipe-content">
-            <h3>{{ recipe.title }}</h3>
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe quis eveniet aliquid expedita doloremque neque, rerum aut est a dolorum necessitatibus quo, obcaecati ducimus ut distinctio adipisci dignissimos? Natus, corrupti.</p>
-            <div>
-              <h4>SCORE</h4>
-              <!-- change scoring system, this is just template for now -->
-              <p>{{ Math.round(recipe.spoonacularScore) }}</p>
-            </div>
+  <div id="recipe-list">
+    <h1>CHALLENGES</h1>
+    <div v-for="recipe in recipes" :key="recipe.id" class="recipe">
+      <img :src="recipe.image" :alt="recipe.title" />
+      <div class="recipe-content">
+        <h3>{{ recipe.title }}</h3>
+        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe quis eveniet aliquid expedita doloremque
+          neque, rerum aut est a dolorum necessitatibus quo, obcaecati ducimus ut distinctio adipisci dignissimos?
+          Natus, corrupti.</p>
+        <div>
+          <h4>SCORE</h4>
+          <!-- change scoring system, this is just template for now -->
+          <p>{{ Math.round(recipe.spoonacularScore) }}</p>
+        </div>
 
-            <div>
-              <h4>Nutritional Information</h4>
-              <!-- <p>{{ recipe.nutrition.nutrients }}</p> -->
-              <p>Calories: {{recipe.nutrition.nutrients[0].amount}}</p>
-              <p>Fat: {{recipe.nutrition.nutrients[1].amount}}</p>
-              <p>Carbohydrates: {{recipe.nutrition.nutrients[3].amount}}</p>
-              <p>Protein: {{ recipe.nutrition.nutrients[10].amount }}</p>
-            </div>
-
-          </div>
+        <div>
+          <h4>Nutritional Information</h4>
+          <!-- <p>{{ recipe.nutrition.nutrients }}</p> -->
+          <p>Calories: {{ recipe.nutrition.nutrients[0].amount }}</p>
+          <p>Fat: {{ recipe.nutrition.nutrients[1].amount }}</p>
+          <p>Carbohydrates: {{ recipe.nutrition.nutrients[3].amount }}</p>
+          <p>Protein: {{ recipe.nutrition.nutrients[10].amount }}</p>
+        </div>
 
       </div>
 
-
     </div>
-  </template>
-  
-  <script>
-  // src="https://unpkg.com/axios/dist/axios.min.js"
-  export default {
-    data() {
-      return {
-        typedIngredient: '', // Text from user input
-        selectedIngredients: [], // List of selected ingredients
-        suggestedIngredients: [], // API suggested ingredients
-        fetchIngredientsTimer: null, // Timer for debouncing
-        //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-        //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
-        apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
-        numberOfRecipes: 3, // Number of recipes to display
-        recipes: [],
-        documentId: null,
-        loadingData: true
-        // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
- 
-      };
-    },
-    computed: {
-    },
-    methods: {
-     // Debounced function to fetch ingredients after typing stops
+
+
+  </div>
+</template>
+
+<script>
+// src="https://unpkg.com/axios/dist/axios.min.js"
+export default {
+  data() {
+    return {
+      typedIngredient: '', // Text from user input
+      selectedIngredients: [], // List of selected ingredients
+      suggestedIngredients: [], // API suggested ingredients
+      fetchIngredientsTimer: null, // Timer for debouncing
+      apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+      //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
+      numberOfRecipes: 3, // Number of recipes to display
+      recipes: [],
+      documentId: null,
+      loadingData: true
+      // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
+
+    };
+  },
+  computed: {
+  },
+  methods: {
+    // Debounced function to fetch ingredients after typing stops
     fetchIngredientsDebounced() {
       clearTimeout(this.fetchIngredientsTimer);
       this.fetchIngredientsTimer = setTimeout(() => {
@@ -109,31 +110,53 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
       }
     },
     // Add the ingredient to the selected list
-    selectIngredient(ingredient) {
-      if (!this.selectedIngredients.includes(ingredient.name)) {
-        this.selectedIngredients.push(ingredient.name);
+    async selectIngredient(ingredient) {
+      if (this.documentId) {
+        try {
+          const ingredientDocRef = doc(db, "ingredients", this.documentId);
+
+          await updateDoc(ingredientDocRef, {
+            ingredient: arrayUnion(ingredient.name)
+          });
+
+          this.selectedIngredients.push(ingredient.name)
+          this.typedIngredient = ''
+          this.suggestedIngredients = []
+          console.log("Ingredient added: ", ingredient);
+        } catch (e) {
+          console.error("Error adding ingredient: ", e);
+        }
+      } else {
+        console.error("No document ID found.");
       }
-      this.typedIngredient = '';
-      this.suggestedIngredients = [];
     },
     // Remove an ingredient from the selected list
-    removeIngredient(index) {
-      this.selectedIngredients.splice(index, 1);
+    async removeIngredient(ingredient,index) {
+      const removeDocRef = doc(db, "ingredients", this.documentId);
+      try {
+        await updateDoc(removeDocRef, {
+          ingredient: arrayRemove(ingredient)
+        });
+        this.selectedIngredients.splice(index, 1);
+        console.log(`${ingredient} removed successfully!`);
+      } catch (error) {
+        console.error("Error removing ingredient:", error);
+      }
     },
     fetchRecipes() {
       const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${this.numberOfRecipes}&addRecipeInformation=true&includeIngredients=${this.selectedIngredients.join(',')}&addRecipeNutrition=true&apiKey=${this.apiKey}`
-        axios.get(apiUrl)
-      .then(response => {
-        console.log(response.data.results)
-        this.recipes = response.data.results
-        //why isnt this updating wtf
-        // this.getDocumentId()
+      axios.get(apiUrl)
+        .then(response => {
+          console.log(response.data.results)
+          this.recipes = response.data.results
+          //why isnt this updating wtf
+          // this.getDocumentId()
         })
-      .catch(error => {
-        console.log(error.message)
-      })
+        .catch(error => {
+          console.log(error.message)
+        })
     },
-      async getDocumentId() {
+    async getDocumentId() {
       try {
         // Get all documents in the "ingredients" collection
         const querySnapshot = await getDocs(collection(db, "ingredients"));
@@ -143,15 +166,15 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
         const docRef = doc(db, "ingredients", this.documentId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            const data = docSnap.data();
-            this.loadingData = true; // Set loading flag to true
-            this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
-            this.loadingData = false; // Set loading flag to false after update
+          const data = docSnap.data();
+          this.loadingData = true; // Set loading flag to true
+          this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
+          this.loadingData = false; // Set loading flag to false after update
         }
 
         // Loop through each document and extract the ID
-          // Assuming you want the first document, you can store its ID
-          // this.fetchDocumentData()
+        // Assuming you want the first document, you can store its ID
+        // this.fetchDocumentData()
 
       } catch (e) {
         console.error("Error getting document ID: ", e);
@@ -180,51 +203,58 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
     //     console.log(error.message)
     //   })
     // }
-    },
-    watch: {
-  selectedIngredients: {
-    handler() {
-      if (!this.loadingData) { // Check if not in loading phase
-        this.fetchRecipes();
-      }
-    },
-    deep: true,
-    immediate: true,
   },
-},
+  watch: {
+    selectedIngredients: {
+      handler() {
+        if (!this.loadingData) { // Check if not in loading phase
+          this.fetchRecipes();
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
 
-    mounted() {
-      this.getDocumentId()
-    }
-  };
-  </script>
+  mounted() {
+    this.getDocumentId()
+  }
+};
+</script>
 
-  <style scoped>  body {
-    font-family: Arial, sans-serif;
+<style scoped>
+body {
+  font-family: Arial, sans-serif;
 }
+
 .recipe {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ddd;
-    padding: 16px;
-    margin: 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .recipe img {
-    width: 200px;
-    height: auto;
-    border-radius: 8px;
-    margin-right: 20px;
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+  margin-right: 20px;
 }
+
 .recipe-content {
-    max-width: 600px;
+  max-width: 600px;
 }
+
 .recipe h3 {
-    margin: 0 0 8px 0;
-    color: #333;
+  margin: 0 0 8px 0;
+  color: #333;
 }
+
 .recipe p {
-    margin: 0;
-    color: #555;
-}</style>
+  margin: 0;
+  color: #555;
+}
+</style>
