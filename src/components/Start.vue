@@ -36,7 +36,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } 
 
   <div id="recipe-list">
     <h1>CHALLENGES</h1>
-    <div v-for="recipe in recipes" :key="recipe.id" class="recipe">
+    <div v-for="recipe in recipes" :key="recipe.id" class="recipe" @click="openModal(recipe)">
       <img :src="recipe.image" :alt="recipe.title" />
       <div class="recipe-content">
         <h3>{{ recipe.title }}</h3>
@@ -64,6 +64,18 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } 
 
 
   </div>
+  <div v-if="isModalVisible" class="modal-overlay" @click.self="closeModal">
+    <div class="modal-content">
+      <h3>{{ selectedRecipe.title }}</h3>
+      <img :src="selectedRecipe.image" alt="Recipe image" />
+      <p>{{ selectedRecipe.description }}</p>
+      <p>Calories: {{ selectedRecipe.nutrition.nutrients[0].amount }}</p>
+      <p>Fat: {{ selectedRecipe.nutrition.nutrients[1].amount }}</p>
+      <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}</p>
+      <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}</p>
+      <button @click="closeModal">Close</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -81,7 +93,9 @@ export default {
       numberOfRecipes: 3, // Number of recipes to display
       recipes: [],
       documentId: null,
-      loadingData: true
+      loadingData: true,
+      isModalVisible: false,
+      selectedRecipe: {}
       // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
 
     };
@@ -90,6 +104,15 @@ export default {
   },
   methods: {
     // Debounced function to fetch ingredients after typing stops
+    openModal(recipe) {
+      this.selectedRecipe = recipe;
+      this.isModalVisible = true;
+    },
+    // Close modal and clear selected recipe
+    closeModal() {
+      this.isModalVisible = false;
+      this.selectedRecipe = {};
+    },
     fetchIngredientsDebounced() {
       clearTimeout(this.fetchIngredientsTimer);
       this.fetchIngredientsTimer = setTimeout(() => {
@@ -256,5 +279,47 @@ body {
 .recipe p {
   margin: 0;
   color: #555;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.modal-content button {
+  background-color: #333;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background-color: #555;
 }
 </style>
