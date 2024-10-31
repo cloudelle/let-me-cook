@@ -1,11 +1,12 @@
 <script setup>
 import axios from "axios";
 import { ref, onMounted } from 'vue';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase.js';
 import { useRouter } from "vue-router";
 import { app, db } from '../firebase';
 import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } from 'firebase/firestore';
+import { useAuth } from '../composables/useAuth.js';
 </script>
 
 
@@ -74,6 +75,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } 
       <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}</p>
       <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}</p>
       <button @click="closeModal">Close</button>
+      <button @click="addChallenge(selectedRecipe.id)">START CHALLENGE!</button>
     </div>
   </div>
 </template>
@@ -83,19 +85,21 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, doc } 
 export default {
   data() {
     return {
+      isLoggedIn: false,
       typedIngredient: '', // Text from user input
       selectedIngredients: [], // List of selected ingredients
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
-      apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+      //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       numberOfRecipes: 3, // Number of recipes to display
       recipes: [],
       documentId: null,
       loadingData: true,
       isModalVisible: false,
-      selectedRecipe: {}
+      selectedRecipe: {},
+      uid : null
       // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
 
     };
@@ -112,6 +116,21 @@ export default {
     closeModal() {
       this.isModalVisible = false;
       this.selectedRecipe = {};
+    },
+    async addChallenge(challengeId) {
+      console.log(this.uid)
+      console.log(challengeId)
+      try {
+        const challengeDocRef = doc(db,"user",this.uid)
+        await updateDoc(challengeDocRef, {
+          activeChallenge: challengeId
+        })
+        console.log("UPDATED")
+      }
+      catch(e) {
+        console.log(e)
+      }
+      this.closeModal()
     },
     fetchIngredientsDebounced() {
       clearTimeout(this.fetchIngredientsTimer);
@@ -240,6 +259,15 @@ export default {
   },
 
   mounted() {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.uid = user.uid;
+        console.log("User is logged in with UID:", this.uid);
+      } else {
+        this.uid = null;
+        console.log("User is not logged in.");
+      }
+    })
     this.getDocumentId()
   }
 };
@@ -248,6 +276,10 @@ export default {
 <style scoped>
 body {
   font-family: Arial, sans-serif;
+}
+
+button {
+  margin: 2px;
 }
 
 .recipe {

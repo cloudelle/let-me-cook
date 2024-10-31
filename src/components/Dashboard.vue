@@ -4,24 +4,10 @@ import { getFirestore, collection, getDoc, setDoc, addDoc, doc } from 'firebase/
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useAuth } from '../composables/useAuth.js';
 
 
-const uid = ref(""); // reactive state to store the user's uid
-const router = useRouter();
-
-onMounted(() => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is signed in, see docs for a list of available properties
-        uid.value = user.uid; // Update the reactive uid
-        // ...
-    } else {
-        // User is signed out
-        router.push('login')
-    }
-});
-});
-
+const { uid } = useAuth(); // Access uid here
 </script>
 
 <template>
