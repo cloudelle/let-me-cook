@@ -41,9 +41,7 @@ import { useAuth } from '../composables/useAuth.js';
       <img :src="recipe.image" :alt="recipe.title" />
       <div class="recipe-content">
         <h3>{{ recipe.title }}</h3>
-        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe quis eveniet aliquid expedita doloremque
-          neque, rerum aut est a dolorum necessitatibus quo, obcaecati ducimus ut distinctio adipisci dignissimos?
-          Natus, corrupti.</p>
+        <p></p>
         <div>
           <h4>SCORE</h4>
           <!-- change scoring system, this is just template for now -->
@@ -93,7 +91,7 @@ export default {
       //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
       apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
-      numberOfRecipes: 3, // Number of recipes to display
+      numberOfRecipes: 15, // Number of recipes to display
       recipes: [],
       documentId: null,
       loadingData: true,
@@ -199,29 +197,41 @@ export default {
         })
     },
     async getDocumentId() {
-      try {
-        // Get all documents in the "ingredients" collection
-        const querySnapshot = await getDocs(collection(db, "ingredients"));
-        console.log(querySnapshot.docs[0])
-        this.documentId = querySnapshot.docs[0].id;
-        console.log("Document ID: ", this.documentId);
+  try {
+    // Get the document reference
+    const getIngredient = doc(db, "user", this.uid);
+    const userDocSnap = await getDoc(getIngredient);
+
+    // Check if the document exists before accessing its data
+    if (userDocSnap.exists()) {
+      // Get the ingredient ID from the user document
+      this.documentId = userDocSnap.data().ingredientId || null;
+      
+      // Check if ingredientId exists
+      if (this.documentId) {
         const docRef = doc(db, "ingredients", this.documentId);
         const docSnap = await getDoc(docRef);
+
+        // Check if the ingredients document exists
         if (docSnap.exists()) {
           const data = docSnap.data();
           this.loadingData = true; // Set loading flag to true
           this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
           this.loadingData = false; // Set loading flag to false after update
+        } else {
+          console.log("No ingredients document found for the provided documentId.");
         }
-
-        // Loop through each document and extract the ID
-        // Assuming you want the first document, you can store its ID
-        // this.fetchDocumentData()
-
-      } catch (e) {
-        console.error("Error getting document ID: ", e);
+      } else {
+        console.log("No ingredientId found in user document.");
       }
-    },
+    } else {
+      console.log("No user document found for the provided UID.");
+    }
+  } catch (e) {
+    console.error("Error getting document ID: ", e);
+  }
+}
+,
     // async fetchDocumentData() {
     //     const docRef = doc(db, "ingredients", this.documentId);
     //     const docSnap = await getDoc(docRef);
@@ -263,12 +273,12 @@ export default {
       if (user) {
         this.uid = user.uid;
         console.log("User is logged in with UID:", this.uid);
+        this.getDocumentId()
       } else {
         this.uid = null;
         console.log("User is not logged in.");
       }
     })
-    this.getDocumentId()
   }
 };
 </script>
