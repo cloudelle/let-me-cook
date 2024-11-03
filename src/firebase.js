@@ -27,7 +27,7 @@ const user = auth.currentUser;
 
 
 export { auth }
-export {db,app}
+export { db, app }
 
 // Get list of users from database
 export async function getUsers() {
@@ -57,6 +57,7 @@ export const register = (event) => {
         .then((data) => {
             var authUid = getAuth().lastNotifiedUid
             addUserInfo(authUid)
+            addIngredientsList(authUid)
             router.push('/login')
         })
         .catch((error) => {
@@ -71,12 +72,26 @@ export async function addUserInfo(authUid) {
             name: name.value,
             email: email.value,
             points: 0,
-            streak: 0
+            streak: 0,
+            activeChallenge: ""
+
         });
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 }
+
+export async function addIngredientsList(authUid) {
+    try {
+        await setDoc(doc(db, "ingredients", authUid), {
+            ingredient: [],
+
+        });
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+
 export const login = (event) => {
 
     event.preventDefault();
