@@ -9,7 +9,7 @@ import Leaderboard from "../components/Leaderboard.vue"
 
 const routes = [
     {
-        path: "/about",
+        path: "/",
         name: "About",
         component: About,
     },
