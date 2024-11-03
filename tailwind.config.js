@@ -8,13 +8,11 @@ export default {
     extend: {
         colors: {
           tomato: '#FF6347',
-          olive: '#808000',
-          cream: '#FFFDD0',
-          sunflower: '#FFD700',
-          charcoal: '#333333',
-          offwhite: '#F8F8F8',
-          sage: '#B2AC88',
-          darkseagreen: '#8FBC8F'
+          tomatoLight: '#ffd0cc'
+    },
+    fontFamily: {
+      'ultra': ['Ultra'],
+      'merienda': ["Merienda"]
     },
   },
   plugins: [],

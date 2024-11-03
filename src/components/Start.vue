@@ -10,6 +10,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
 
 
 <template>
+    <div class="h-[calc(100vh-6.5rem)] overflow-scroll">
       <!-- Dropdown to select ingredients -->
       <div>
     <!-- Input for typing ingredients -->
@@ -63,6 +64,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
 
 
     </div>
+  </div>
   </template>
   
   <script>
@@ -210,6 +212,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
     margin: 16px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
 }
 .recipe img {
     width: 200px;

@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { onAuthStateChanged } from 'firebase/auth';
-  import { auth } from '../firebase.js';
+  import { auth, email } from '../firebase.js';
   import { useRouter } from "vue-router";
   import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 
@@ -52,14 +52,21 @@
       });
   })
 </script>
+
+
+
 <template>
-    Name: {{ userName }}
-    <br>
-    Email: {{ userEmail }}
-    <br>
-    Points: {{ userPoints }}
-    <br>
-    Streak: {{ userStreak }}
+
+      <div>
+        Name: {{ userName }}
+        <br>
+        Email: {{ userEmail }}
+        <br>
+        Points: {{ userPoints }}
+        <br>
+        Streak: {{ userStreak }}
+
+      </div>
 
     <h3>Input Your Ingredients:
         <span>
@@ -67,6 +74,7 @@
             <button @click="addIngredient">Add</button>
         </span>
     </h3>
+
 </template>
 
 <script>
@@ -84,6 +92,8 @@ export default {
     return {
       ingredient: null,
       documentId: null, // To store the document ID
+      activeTab: 'Active Challenges',
+      tabs: ['Active Challenges', 'Posts', 'Tagged'],
     }
   },
 

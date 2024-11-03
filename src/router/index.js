@@ -5,6 +5,7 @@ import Register from "../components/Register.vue"
 import Login from "../components/Login.vue"
 import Profile from "../components/Profile.vue"
 import Start from "../components/Start.vue"
+import Leaderboard from "../components/Leaderboard.vue"
 
 const routes = [
     {
@@ -40,6 +41,12 @@ const routes = [
     name: "Start",
     component: Start,
   },
+  {
+    path: "/leaderboard",
+    name: "Leaderboard",
+    component: Leaderboard,
+  },
+
 ]
 
 const router = createRouter({

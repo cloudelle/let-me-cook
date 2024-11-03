@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Open+Sans:ital@0;1&display=swap');
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	@font-face {
+		font-family: 'Chunk ReThunk';
+		src: url('/modules/bnj-brand-assets/fonts/chunk-rethunk-en.woff2') format('woff2');
+		text-rendering: optimizeLegibility;
+		font-display: block;
+	}
+
+  }
+

@@ -46,6 +46,7 @@ onMounted(() => {
 <style scoped>
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
 }
 .recipe {
     display: flex;

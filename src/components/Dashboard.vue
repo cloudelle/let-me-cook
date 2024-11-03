@@ -25,11 +25,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <p v-if="uid">User ID: {{ uid }}</p>
-    <p v-else>No user logged in</p>
+  <div class="h-[calc(100vh-7rem)] mt-[calc(7rem)]">
+    <div>
+      <p v-if="uid">User ID: {{ uid }}</p>
+      <p v-else>No user logged in</p>
+    </div>
+    <button v-on:click="getUserInfoById(uid)" >Test</button>
+
   </div>
-  <button v-on:click="getUserInfoById(uid)" >Test</button>
 </template>
 
 <style scoped>
