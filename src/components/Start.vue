@@ -76,7 +76,7 @@ import { collection, getDoc, getDocs, updateDoc, arrayUnion, doc } from 'firebas
         fetchIngredientsTimer: null, // Timer for debouncing
         //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
         //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
-        apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
+        // apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
         numberOfRecipes: 3, // Number of recipes to display
         recipes: [],
         documentId: null,
