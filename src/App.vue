@@ -1,12 +1,14 @@
 <script setup>
 // import { onAuthStateChanged} from './firebase.js'
 import Navbar from "./components/Navbar.vue"
+import Footere from "./components/Footere.vue"
 </script>
 
 <template>
 
     <Navbar/>
     <router-view/>  
+    <Footere/>
 
   <!-- <div id="nav">
     <nav>

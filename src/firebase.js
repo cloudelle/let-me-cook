@@ -36,7 +36,6 @@ export async function getUsers() {
     const userInfoList = userSnapshot.docs.map(doc => doc.data());
     console.log(userInfoList)
     return userInfoList;
-
 }
 
 export const name = ref("");
