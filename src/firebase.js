@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDoc, getDocs, setDoc, addDoc, doc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getStorage } from "firebase/storage"; 
 import router from "./router";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -22,12 +23,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 const user = auth.currentUser;
 
 
-
 export { auth }
-export { db, app }
+export { db, app, storage }; 
 
 // Get list of users from database
 export async function getUsers() {

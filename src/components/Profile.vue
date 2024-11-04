@@ -23,6 +23,7 @@ const recipeScore = ref('');
 const description = ref('');
 const steps = ref('');
 const ingredients = ref('');
+const availableChallenges = ref([]); // Array of available challenges
 
 
 
@@ -80,7 +81,7 @@ async function displayActiveChallenge() {
         console.log(response.data);
         recipeTitle.value = response.data.title
         recipeImg.value = response.data.image
-        recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes 
+        recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes
         description.value = response.data.summary
         steps.value = response.data.analyzedInstructions[0].steps
       })
@@ -88,8 +89,8 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
-      var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
-      axios.get(ingredientUrl)
+    var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
+    axios.get(ingredientUrl)
       .then(response => {
         ingredients.value = response.data.ingredients
         console.log(ingredients.value);
@@ -98,12 +99,40 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
-      // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
-      // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
-      // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
+    // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
+    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
+    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
 
   }
 }
+
+async function updateActiveChallenge(challengeId) {
+  if (documentId.value) {
+    try {
+      const docRef = doc(db, 'user', documentId.value);
+      await updateDoc(docRef, {
+        activeChallenge: challengeId,
+      });
+      userActiveChallenge.value = challengeId; // Update the local variable
+      console.log('Active challenge updated to:', challengeId);
+      displayActiveChallenge(); // Display the new challenge
+    } catch (e) {
+      console.error('Error updating active challenge:', e);
+    }
+  } else {
+    console.error('No document ID found.');
+  }
+}
+
+// Mock function to populate available challenges (replace with actual data)
+function loadAvailableChallenges() {
+  availableChallenges.value = [
+    { id: '12345', name: 'Pasta Challenge' },
+    { id: '67890', name: 'Salad Challenge' },
+    { id: '11223', name: 'Dessert Challenge' }
+  ];
+}
+
 
 // Authentication check on component mount
 onMounted(() => {
@@ -115,6 +144,7 @@ onMounted(() => {
       getUserData(uid);
     }
   });
+  loadAvailableChallenges(); // Load available challenges
 });
 </script>
 
@@ -122,27 +152,35 @@ onMounted(() => {
   <br />
   <h1>Active Challenges</h1>
   <br>
-  <b><u>{{recipeTitle}}</u></b>
+  <b><u>{{ recipeTitle }}</u></b>
   <p v-html="description"></p>
   <br>
-  <p>Score: {{recipeScore}}</p>
+  <p>Score: {{ recipeScore }}</p>
   <img v-bind:src="recipeImg" alt="">
   <br>
 
   <h3>Recipe Steps:</h3>
   <ol>
-  <li v-for="(step, index) in steps" :key="index">
-    {{ index + 1 }}. {{ step.step }}
-  </li>
+    <li v-for="(step, index) in steps" :key="index">
+      {{ index + 1 }}. {{ step.step }}
+    </li>
   </ol>
-  
-  
-  <br/>
-  <button>Complete Challenge</button>
+
+  <br />
 
   <!-- <h3>Input Your Ingredients:</h3>
   <span>
     <input type="text" placeholder="Type your ingredient here" v-model="ingredient" />
     <button @click="addIngredient">Add</button>
   </span> -->
+
+  <!-- <h3>Select a New Challenge:</h3>
+  <select v-model="userActiveChallenge" @change="updateActiveChallenge(userActiveChallenge)">
+    <option v-for="challenge in availableChallenges" :key="challenge.id" :value="challenge.id">
+      {{ challenge.name }}
+    </option>
+  </select>
+  <br/>
+  <button @click="updateActiveChallenge(userActiveChallenge)">Complete Challenge</button> -->
+
 </template>
