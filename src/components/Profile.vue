@@ -2,11 +2,9 @@
 import axios from "axios";
 import { ref, onMounted } from 'vue';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useRouter } from 'vue-router';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '../firebase.js';
-
-const router = useRouter();
+import router from '../router'; // (new) Import the router instance from index.js
 
 
 // Define reactive variables
@@ -23,8 +21,6 @@ const recipeScore = ref('');
 const description = ref('');
 const steps = ref('');
 const ingredients = ref('');
-const availableChallenges = ref([]); // Array of available challenges
-
 
 
 async function getUserData(uid) {
@@ -51,15 +47,12 @@ async function getUserData(uid) {
 
 // Function to add ingredient
 async function addIngredient() {
-
   if (documentId.value) {
     try {
       const docRef = doc(db, "ingredients", documentId.value);
-
       await updateDoc(docRef, {
         ingredient: arrayUnion(ingredient.value)
       });
-
       console.log("Ingredient added: ", ingredient.value);
     } catch (e) {
       console.error("Error adding ingredient: ", e);
@@ -70,69 +63,39 @@ async function addIngredient() {
 }
 
 async function displayActiveChallenge() {
-
-
   if (userActiveChallenge.value != "") {
-
-    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=f88baf2ecf9a4eab92a25613785c4ba1"
-
+    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=739a15dee8b84c5187535bfa56e19ccb";
     axios.get(url)
       .then(response => {
-        console.log(response.data);
-        recipeTitle.value = response.data.title
-        recipeImg.value = response.data.image
-        recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes
-        description.value = response.data.summary
-        steps.value = response.data.analyzedInstructions[0].steps
+        recipeTitle.value = response.data.title;
+        recipeImg.value = response.data.image;
+        recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes;
+        description.value = response.data.summary;
+        steps.value = response.data.analyzedInstructions[0].steps;
       })
       .catch(error => {
         console.log(error.message);
       });
 
-    var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
+    var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb";
     axios.get(ingredientUrl)
       .then(response => {
-        ingredients.value = response.data.ingredients
-        console.log(ingredients.value);
+        ingredients.value = response.data.ingredients;
       })
       .catch(error => {
         console.log(error.message);
       });
-
-    // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
-    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
-    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
-
   }
 }
 
-async function updateActiveChallenge(challengeId) {
-  if (documentId.value) {
-    try {
-      const docRef = doc(db, 'user', documentId.value);
-      await updateDoc(docRef, {
-        activeChallenge: challengeId,
-      });
-      userActiveChallenge.value = challengeId; // Update the local variable
-      console.log('Active challenge updated to:', challengeId);
-      displayActiveChallenge(); // Display the new challenge
-    } catch (e) {
-      console.error('Error updating active challenge:', e);
-    }
+// Function to complete challenge and redirect
+function completeChallenge() {
+  if (userActiveChallenge.value) {
+    router.push({ name: 'Social' }); // Redirect to Social page by name
   } else {
-    console.error('No document ID found.');
+    alert('No active challenge to complete.');
   }
 }
-
-// Mock function to populate available challenges (replace with actual data)
-function loadAvailableChallenges() {
-  availableChallenges.value = [
-    { id: '12345', name: 'Pasta Challenge' },
-    { id: '67890', name: 'Salad Challenge' },
-    { id: '11223', name: 'Dessert Challenge' }
-  ];
-}
-
 
 // Authentication check on component mount
 onMounted(() => {
@@ -144,7 +107,6 @@ onMounted(() => {
       getUserData(uid);
     }
   });
-  loadAvailableChallenges(); // Load available challenges
 });
 </script>
 
@@ -168,19 +130,5 @@ onMounted(() => {
 
   <br />
 
-  <!-- <h3>Input Your Ingredients:</h3>
-  <span>
-    <input type="text" placeholder="Type your ingredient here" v-model="ingredient" />
-    <button @click="addIngredient">Add</button>
-  </span> -->
-
-  <!-- <h3>Select a New Challenge:</h3>
-  <select v-model="userActiveChallenge" @change="updateActiveChallenge(userActiveChallenge)">
-    <option v-for="challenge in availableChallenges" :key="challenge.id" :value="challenge.id">
-      {{ challenge.name }}
-    </option>
-  </select>
-  <br/>
-  <button @click="updateActiveChallenge(userActiveChallenge)">Complete Challenge</button> -->
-
+  <button @click="completeChallenge">Complete Challenge</button> 
 </template>

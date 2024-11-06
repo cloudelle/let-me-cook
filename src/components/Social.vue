@@ -1,55 +1,57 @@
 <template>
   <div>
     <h2>Post Your Completed Challenge</h2>
-    
-    <!-- Dropdown to select a challenge -->
-    <h3>Select a Challenge:</h3>
-    <select v-model="selectedChallenge" @change="validateChallenge">
-      <option value="">Select a challenge</option>
-      <option v-for="challenge in availableChallenges" :key="challenge.id" :value="challenge.id">
-        {{ challenge.name }}
-      </option>
-    </select>
 
-    <p v-if="!selectedChallenge">Please select a valid challenge to proceed.</p>
+    <!-- Display recipe title instead of challenge ID -->
+    <p v-if="recipeTitle">Challenge: {{ recipeTitle }}</p>
 
     <!-- File upload and caption input -->
     <div v-if="selectedChallenge">
       <input type="file" @change="onFileChange" />
       <input type="text" v-model="caption" placeholder="Add a caption" />
-      <button @click="uploadFile" :disabled="!file || !caption">Upload</button>
+      
+      <!-- Combined "Challenge Complete" button -->
+      <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
+        Challenge Complete
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
-import { storage } from '../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import axios from 'axios';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 
 export default {
   data() {
     return {
       file: null,
       caption: '',
+      recipeTitle: '', // Holds the recipe title for display
       selectedChallenge: '', // Holds the selected challenge ID
-      availableChallenges: [], // List of available challenges for the user
+      recipeImg: '',
+      recipeScore: '',
+      description: '',
+      steps: [],
+      ingredients: [],
     };
   },
   methods: {
     onFileChange(event) {
       this.file = event.target.files[0];
     },
-    async uploadFile() {
+    async completeAndUploadChallenge() {
+      // Ensure file, caption, and selected challenge exist
       if (!this.file || !this.caption || !this.selectedChallenge) {
-        alert('Please select a challenge, choose a file, and add a caption before uploading.');
+        alert('Please select a challenge, choose a file, and add a caption before completing.');
         return;
       }
 
-      // Create a storage reference
+      // Create a storage reference and upload the file
       const fileRef = storageRef(storage, `uploads/${this.selectedChallenge}/${this.file.name}`);
 
       try {
@@ -60,51 +62,101 @@ export default {
         const url = await getDownloadURL(fileRef);
         console.log('File uploaded successfully:', url);
         alert(`File uploaded successfully: ${url}`);
-        
-        // Optionally, you can save the URL and caption to a database here
-      } catch (error) {
-        console.error('Upload failed:', error);
-        alert('Upload failed. Please try again.');
-      }
-    },
-    async getUserChallenges(uid) {
-      try {
-        const userDocRef = doc(db, 'user', uid);
-        const userDocSnap = await getDoc(userDocRef);
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          if (userData.activeChallenge) {
-            // Add logic to fetch challenges if they exist
-            this.availableChallenges = [
-              { id: userData.activeChallenge, name: `Challenge ${userData.activeChallenge}` }
-            ];
-          } else {
-            console.log('No active challenges found.');
-          }
+        // Mark challenge as complete in Firestore by clearing the activeChallenge field
+        const user = getAuth().currentUser;
+        if (user) {
+          const userDocRef = doc(db, 'user', user.uid);
+          await updateDoc(userDocRef, {
+            activeChallenge: '' // Clear the active challenge after completion
+          });
+          alert('Challenge completed successfully!');
         } else {
-          console.log('User document not found.');
+          alert('User not authenticated.');
         }
-      } catch (e) {
-        console.error('Error fetching user challenges:', e);
+      } catch (error) {
+        console.error('Error completing challenge or uploading file:', error);
+        alert('Failed to complete challenge. Please try again.');
       }
     },
-    validateChallenge() {
-      if (!this.selectedChallenge) {
-        alert('Please select a valid challenge to proceed.');
+    // async fetchActiveChallenge(uid) {
+    //   try {
+    //     const userDocRef = doc(db, 'user', uid);
+    //     const userDocSnap = await getDoc(userDocRef);
+
+    //     if (userDocSnap.exists()) {
+    //       const userData = userDocSnap.data();
+    //       this.selectedChallenge = userData.activeChallenge;
+
+    //       if (this.selectedChallenge) {
+    //         // Fetch recipe details for the active challenge
+    //         const recipeUrl = `https://api.spoonacular.com/recipes/${this.selectedChallenge}/information?includeNutrition=false&apiKey=739a15dee8b84c5187535bfa56e19ccb`;
+    //         const response = await axios.get(recipeUrl);
+    //         this.recipeTitle = response.data.title;
+    //         this.recipeImg = response.data.image;
+    //         this.recipeScore = response.data.readyInMinutes * response.data.analyzedInstructions[0].steps.length;
+    //         this.description = response.data.summary;
+    //         this.steps = response.data.analyzedInstructions[0].steps;
+
+    //         const ingredientUrl = `https://api.spoonacular.com/recipes/${this.selectedChallenge}/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb`;
+    //         const ingredientResponse = await axios.get(ingredientUrl);
+    //         this.ingredients = ingredientResponse.data.ingredients;
+    //       } else {
+    //         alert("No active challenge found.");
+    //       }
+    //     } else {
+    //       console.log('User document not found.');
+    //     }
+    //   } catch (e) {
+    //     console.error('Error fetching challenge:', e);
+    //   }
+    // },
+    async fetchActiveChallenge(uid) {
+  try {
+    const userDocRef = doc(db, 'user', uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      this.selectedChallenge = userData.activeChallenge;
+
+      if (this.selectedChallenge) {
+        // Use mock data for development if API calls are unavailable
+        this.recipeTitle = "Sample Recipe Title";
+        this.recipeImg = "https://via.placeholder.com/150"; // Placeholder image
+        this.recipeScore = 20;
+        this.description = "This is a sample description for the recipe.";
+        this.steps = [
+          { step: "Step 1: Preheat the oven." },
+          { step: "Step 2: Mix ingredients." },
+          { step: "Step 3: Bake for 20 minutes." },
+        ];
+        this.ingredients = [
+          { name: "Sample Ingredient 1" },
+          { name: "Sample Ingredient 2" },
+        ];
+      } else {
+        alert("No active challenge found.");
       }
+    } else {
+      console.log('User document not found.');
     }
+  } catch (e) {
+    console.error('Error fetching challenge:', e);
+  }
+}
+
   },
-  onMounted() {
+  mounted() {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
-        this.getUserChallenges(uid);
+        this.fetchActiveChallenge(user.uid); // Fetch active challenge details
       } else {
         console.log('User not authenticated');
+        this.$router.push('/login'); // Redirect to login if not authenticated
       }
     });
-  }
+  },
 };
 </script>

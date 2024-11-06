@@ -27,8 +27,7 @@ const storage = getStorage(app);
 const user = auth.currentUser;
 
 
-export { auth }
-export { db, app, storage }; 
+export { auth, db, app, storage };
 
 // Get list of users from database
 export async function getUsers() {
