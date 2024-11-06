@@ -97,9 +97,22 @@ import { useAuth } from '../composables/useAuth.js';
       <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}g</p>
       <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}g</p>
       <button @click="closeModal" style="background-color:rgb(255, 157, 101); font-weight: 700;">Close</button>
-      <button @click="addChallenge(selectedRecipe.id)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START CHALLENGE!</button>
+      <button @click="addChallenge(selectedRecipe)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START CHALLENGE!</button>
     </div>
   </div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" ref="toastRef">
+    <div class="toast-header">
+      <!-- <img src="..." class="rounded me-2" alt="..."> -->
+      <strong class="me-auto">Challenge Added!</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Successfully added {{ selectedChallenge }}! Click <router-link to="/Profile">here</router-link> to view the details!
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -112,16 +125,20 @@ export default {
       selectedIngredients: [], // List of selected ingredients
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
-      // apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      apiKey: "739a15dee8b84c5187535bfa56e19ccb", //af8d927cc09d4e718de7f8b37b6faec8
+      //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
-      numberOfRecipes: 5, // Number of recipes to display
+      //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+      apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
+      numberOfRecipes: 10, // Number of recipes to display
       recipes: [],
       documentId: null,
       loadingData: true,
       isModalVisible: false,
       selectedRecipe: {},
-      uid : null
+      uid : null,
+      selectedChallenge : null,
+      toast: null,
       // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
 
     };
@@ -139,15 +156,23 @@ export default {
       this.isModalVisible = false;
       this.selectedRecipe = {};
     },
+    showToast() {
+      if (this.toast) {
+        this.toast.show()
+      }
+    },
     async addChallenge(challengeId) {
       console.log(this.uid)
       console.log(challengeId)
+      this.selectedChallenge = challengeId.title
       try {
         const challengeDocRef = doc(db,"user",this.uid)
         await updateDoc(challengeDocRef, {
-          activeChallenge: challengeId
+          activeChallenge: challengeId.id
         })
         console.log("UPDATED")
+        this.showToast()
+
       }
       catch(e) {
         console.log(e)
@@ -158,12 +183,12 @@ export default {
       clearTimeout(this.fetchIngredientsTimer);
       this.fetchIngredientsTimer = setTimeout(() => {
         this.fetchIngredients();
-      }, 1500); // 1.5 seconds
+      }, 500); // 0.5 seconds
     },
     // API call to fetch ingredients based on typed input
     fetchIngredients() {
       if (this.typedIngredient.length > 1) {
-        const apiUrl = `https://api.spoonacular.com/food/ingredients/autocomplete?query=${this.typedIngredient}&number=5&apiKey=${this.apiKey}`;
+        const apiUrl = `https://api.spoonacular.com/food/ingredients/autocomplete?query=${this.typedIngredient}&number=15&apiKey=${this.apiKey}`;
         axios.get(apiUrl)
           .then(response => {
             this.suggestedIngredients = response.data;
@@ -175,9 +200,9 @@ export default {
     },
     // Add the ingredient to the selected list
     async selectIngredient(ingredient) {
-      if (this.documentId) {
+      if (this.uid) {
         try {
-          const ingredientDocRef = doc(db, "ingredients", this.documentId);
+          const ingredientDocRef = doc(db, "ingredients", this.uid);
 
           await updateDoc(ingredientDocRef, {
             ingredient: arrayUnion(ingredient.name)
@@ -196,7 +221,7 @@ export default {
     },
     // Remove an ingredient from the selected list
     async removeIngredient(ingredient,index) {
-      const removeDocRef = doc(db, "ingredients", this.documentId);
+      const removeDocRef = doc(db, "ingredients", this.uid);
       try {
         await updateDoc(removeDocRef, {
           ingredient: arrayRemove(ingredient)
@@ -222,18 +247,10 @@ export default {
     },
     async getDocumentId() {
   try {
-    // Get the document reference
-    const getIngredient = doc(db, "user", this.uid);
-    const userDocSnap = await getDoc(getIngredient);
-
-    // Check if the document exists before accessing its data
-    if (userDocSnap.exists()) {
-      // Get the ingredient ID from the user document
-      this.documentId = userDocSnap.data().ingredientId || null;
       
       // Check if ingredientId exists
-      if (this.documentId) {
-        const docRef = doc(db, "ingredients", this.documentId);
+      if (this.uid) {
+        const docRef = doc(db, "ingredients", this.uid);
         const docSnap = await getDoc(docRef);
 
         // Check if the ingredients document exists
@@ -245,12 +262,7 @@ export default {
         } else {
           console.log("No ingredients document found for the provided documentId.");
         }
-      } else {
-        console.log("No ingredientId found in user document.");
       }
-    } else {
-      console.log("No user document found for the provided UID.");
-    }
   } catch (e) {
     console.error("Error getting document ID: ", e);
   }
@@ -305,6 +317,10 @@ export default {
         console.log("User is not logged in.");
       }
     })
+    const toastEl = this.$refs.toastRef;
+    if (toastEl) {
+      this.toast = new bootstrap.Toast(toastEl);
+    }
   }
 };
 </script>

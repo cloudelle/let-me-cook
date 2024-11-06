@@ -76,7 +76,7 @@ async function displayActiveChallenge() {
 
   if (userActiveChallenge.value != "") {
 
-    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=739a15dee8b84c5187535bfa56e19ccb"
+    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=f22b8ffb2f4f476fb33831a32e903b77"
     // 739a15dee8b84c5187535bfa56e19ccb
 
     axios.get(url)
@@ -103,7 +103,7 @@ async function displayActiveChallenge() {
       });
 
 
-      var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
+      var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=f22b8ffb2f4f476fb33831a32e903b77"
       axios.get(nutritionUrl)
       .then(response => {
         calories.value = response.data.calories
