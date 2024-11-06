@@ -11,39 +11,63 @@ import { useAuth } from '../composables/useAuth.js';
 
 
 <template>
-  <div>
-    <!-- Input for typing ingredients -->
-    <label for="ingredient-input">Type Ingredient:</label>
-    <input v-model="typedIngredient" @input="fetchIngredientsDebounced" id="ingredient-input" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merienda">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+  
+  <section class="heading row">
+    <h1>Challenges</h1>
 
-    <!-- Dropdown for suggested ingredients -->
-    <ul v-if="suggestedIngredients.length">
-      <li v-for="(ingredient, index) in suggestedIngredients" :key="index" @click="selectIngredient(ingredient)">
-        {{ ingredient.name }}
-      </li>
-    </ul>
+  <section class="ingredients">
+    <!-- Input for typing ingredients -->
+    <!-- <div class="container-fluid">
+      <div class="row"> -->
+        <div class="type-ingredient">
+          <span class="search-icon" style="font-family: Outfit, FontAwesome;">&#xf002;</span>
+          <input v-model="typedIngredient" @input="fetchIngredientsDebounced" id="ingredient-input" type="text" placeholder="Enter Your Ingredient" style="font-family: Outfit, FontAwesome;"/>
+          <span>
+            <button v-if="typedIngredient" class="clear-button" @click="clearInput" style="font-family: Outfit, FontAwesome; ">&#xf00d;</button>
+          </span>
+        </div>
+        <!-- Dropdown for suggested ingredients -->
+        <div class="suggested-ingredient">
+          <ul v-if="suggestedIngredients.length && typedIngredient">
+            <li v-for="(ingredient, index) in suggestedIngredients" :key="index" @click="selectIngredient(ingredient)">
+              {{ ingredient.name }}
+            </li>
+          </ul>
+        </div>
+      <!-- </div>
+    </div> -->
 
     <!-- Selected Ingredients List -->
-    <div v-if="selectedIngredients.length">
-      <h3>Selected Ingredients:</h3>
-      <ul>
-        <li v-for="(ingredient, index) in selectedIngredients" :key="index">
-          {{ ingredient }}
-          <button @click="removeIngredient(ingredient,index)">X</button>
-        </li>
-      </ul>
+    <div class="selected-ingredient">
+      <div v-if="selectedIngredients.length">
+        <!-- <h3>Selected Ingredients:</h3> -->
+        <div class="sel-ingredients">
+          <ul>
+            <li v-for="(ingredient, index) in selectedIngredients" :key="index">
+              {{ ingredient }}
+              <button @click="removeIngredient(ingredient,index)">X</button>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
+
+</section>
 
   <div id="recipe-list">
-    <h1>CHALLENGES</h1>
+    <h1>Your suggested recipes!</h1>
     <div v-for="recipe in recipes" :key="recipe.id" class="recipe" @click="openModal(recipe)">
-      <img :src="recipe.image" :alt="recipe.title" />
+      <img :src="recipe.image" :alt="recipe.title" class="image-container-wrapper"/>
       <div class="recipe-content">
         <h3>{{ recipe.title }}</h3>
         <p></p>
-        <div>
-          <h4>SCORE</h4>
+        <div class="recipe-score">
+          <h4>Score</h4>
           <!-- change scoring system, this is just template for now -->
           <p>{{ Math.round(recipe.spoonacularScore) }}</p>
         </div>
@@ -51,10 +75,10 @@ import { useAuth } from '../composables/useAuth.js';
         <div>
           <h4>Nutritional Information</h4>
           <!-- <p>{{ recipe.nutrition.nutrients }}</p> -->
-          <p>Calories: {{ recipe.nutrition.nutrients[0].amount }}</p>
-          <p>Fat: {{ recipe.nutrition.nutrients[1].amount }}</p>
-          <p>Carbohydrates: {{ recipe.nutrition.nutrients[3].amount }}</p>
-          <p>Protein: {{ recipe.nutrition.nutrients[10].amount }}</p>
+          <p>Calories: {{ recipe.nutrition.nutrients[0].amount }}cal</p>
+          <p>Fat: {{ recipe.nutrition.nutrients[1].amount }}g</p>
+          <p>Carbohydrates: {{ recipe.nutrition.nutrients[3].amount }}g</p>
+          <p>Protein: {{ recipe.nutrition.nutrients[10].amount }}g</p>
         </div>
 
       </div>
@@ -68,12 +92,12 @@ import { useAuth } from '../composables/useAuth.js';
       <h3>{{ selectedRecipe.title }}</h3>
       <img :src="selectedRecipe.image" alt="Recipe image" />
       <p>{{ selectedRecipe.description }}</p>
-      <p>Calories: {{ selectedRecipe.nutrition.nutrients[0].amount }}</p>
-      <p>Fat: {{ selectedRecipe.nutrition.nutrients[1].amount }}</p>
-      <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}</p>
-      <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}</p>
-      <button @click="closeModal">Close</button>
-      <button @click="addChallenge(selectedRecipe.id)">START CHALLENGE!</button>
+      <p>Calories: {{ selectedRecipe.nutrition.nutrients[0].amount }}cal</p>
+      <p>Fat: {{ selectedRecipe.nutrition.nutrients[1].amount }}g</p>
+      <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}g</p>
+      <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}g</p>
+      <button @click="closeModal" style="background-color:rgb(255, 157, 101); font-weight: 700;">Close</button>
+      <button @click="addChallenge(selectedRecipe.id)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START CHALLENGE!</button>
     </div>
   </div>
 </template>
@@ -89,9 +113,9 @@ export default {
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
       // apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+      apiKey: "739a15dee8b84c5187535bfa56e19ccb", //af8d927cc09d4e718de7f8b37b6faec8
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
-      numberOfRecipes: 15, // Number of recipes to display
+      numberOfRecipes: 5, // Number of recipes to display
       recipes: [],
       documentId: null,
       loadingData: true,
@@ -230,8 +254,10 @@ export default {
   } catch (e) {
     console.error("Error getting document ID: ", e);
   }
-}
-,
+},
+  clearInput() {
+    this.typedIngredient = '';
+  }
     // async fetchDocumentData() {
     //     const docRef = doc(db, "ingredients", this.documentId);
     //     const docSnap = await getDoc(docRef);
@@ -284,12 +310,156 @@ export default {
 </script>
 
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+.heading h1{
+  font-size: 45px;
+  font-weight: bold;
+  font-family: "Merienda", serif;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  letter-spacing: 6px;
+  
+  padding: 40px;
+  /* background-color: rgb(255, 243, 234); */
+}
+
+.heading  {
+  background-color: rgb(235, 235, 235);
+}
+
+.ingredients {
+  text-align: center;
+}
+
+.ingredients label {
+  font-size: 20px;
+}
+
+.type-ingredient {
+  display: flex;
+  border: 1px solid;
+  box-sizing: border-box;
+  font-family: "Outfit", sans-serif;
+  border: 2px solid rgb(255, 157, 101);
+  border-radius: 20px;
+  width: 50%;
+  max-width: 50%;
+  text-align: start;
+  padding-left: 20px;
+  margin: auto;
+  transition: box-shadow 0.25s;
+  background-color: white;
+}
+
+.type-ingredient:focus-within {
+  box-shadow: 0 0 3px rgb(255, 102, 1);
+}
+
+.type-ingredient .search-icon {
+  font-size: 150%;
+  color: grey;
+  justify-content: left;
+  background-color: white;
+  padding-top: 2px;
+}
+
+.clear-button {
+  right: 10px; /* Adjust this value as needed */
+  /* background: none; */
+  border: none;
+  cursor: pointer;
+  font-size: 150%; /* Adjust size as needed */
+  padding-left: 5px;
+  color: rgb(165, 165, 165);
+}
+
+.clear-button:hover {
+  color: #6a6a6a; /* Hover color */
+}
+
+.type-ingredient input {
+  flex: 0.98;
+  outline: 0;
+  padding: 6px 20px;
+  padding-left: 5px;
+  margin-left: 5px;
+  font-size: 20px;
+  width: 88%;
+  /* background: transparent; */
+}
+
+.suggested-ingredient ul {
+  position: relative;
+  width: 50%;
+  margin: auto;
+  top: 100%; /* Aligns right below the input */
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  z-index: 10;
+  padding-left: 15px;
+}
+
+.suggested-ingredient ul li {
+  text-align: left;
+  padding: 8px 0 8px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.suggested-ingredient ul li:hover {
+  padding-left: 5px;
+  background-color: #d7d7d7 !important;
+}
+
+.selected-ingredient {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.sel-ingredients ul{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 0;
+  list-style: none;
+  padding: 0;
+  width: 50%;
+  max-width: 50%;
+  margin: auto;
+}
+
+.sel-ingredients ul li {
+  display: inline-flex;
+  margin-right: 20px;
+  background: rgb(255, 157, 101);
+  border: 2px solid rgb(255, 157, 101);
+  border-radius: 20px;
+  font-size: 17px;
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  padding: 8px 10px;
+  text-align: center;
+  justify-content: center;
+  cursor: pointer; 
 }
 
 button {
   margin: 2px;
+  padding-left: 2px;
+}
+
+#recipe-list h1 {
+  font-family: "Trirong", serif;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  margin-left: 15px;
+  font-size: 450;
 }
 
 .recipe {
@@ -303,14 +473,35 @@ button {
 }
 
 .recipe img {
-  width: 200px;
-  height: auto;
+  width: 30%;
+  height: auto; 
   border-radius: 8px;
   margin-right: 20px;
+  min-height: 30vh;
+  display: block; 
+  object-fit: cover; 
+  overflow: hidden; 
 }
 
 .recipe-content {
   max-width: 600px;
+}
+.recipe-content h4 {
+  font-size: large;
+  color: rgb(255, 157, 101);
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+
+.recipe-content h3 {
+  font-family: "Trirong", serif;
+  font-weight: bold;
+  font-size: 500;
+}
+
+.recipe-score p {
+  font-weight: bolder;
+  font-size: large;
 }
 
 .recipe h3 {

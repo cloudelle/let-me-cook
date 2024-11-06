@@ -23,7 +23,10 @@ const recipeScore = ref('');
 const description = ref('');
 const steps = ref('');
 const ingredients = ref('');
-
+const calories = ref('');
+const carbs = ref('');
+const fat  = ref('');
+const protein = ref('');
 
 
 async function getUserData(uid) {
@@ -73,7 +76,8 @@ async function displayActiveChallenge() {
 
   if (userActiveChallenge.value != "") {
 
-    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=f88baf2ecf9a4eab92a25613785c4ba1"
+    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=739a15dee8b84c5187535bfa56e19ccb"
+    // 739a15dee8b84c5187535bfa56e19ccb
 
     axios.get(url)
       .then(response => {
@@ -88,7 +92,7 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
-      var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
+      var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=f88baf2ecf9a4eab92a25613785c4ba1"
       axios.get(ingredientUrl)
       .then(response => {
         ingredients.value = response.data.ingredients
@@ -98,10 +102,27 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
+
+      var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=af8d927cc09d4e718de7f8b37b6faec8"
+      axios.get(nutritionUrl)
+      .then(response => {
+        calories.value = response.data.calories
+        carbs.value = response.data.carbs
+        fat.value = response.data.fat
+        protein.value = response.data.protein
+
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error.message);
+      });
+
       // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
       // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
       // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
 
+  }else {
+    var active = False
   }
 }
 
@@ -136,9 +157,29 @@ onMounted(() => {
   </li>
   </ol>
   
-  
+    <br>
+  <div v-if="ingredients && ingredients.length">
+    <h3>Ingredients:</h3>
+    <ol>
+      <li v-for="(item, index) in ingredients" :key="index">
+        {{ index + 1 }}. {{ item.name }}
+      </li>
+    </ol>
+  </div>
+
+
+
   <br/>
+  <br>
+  <b><u>Nutrition Info</u></b><br>
+  Calories:<p>{{calories}}</p>
+  Carbs:<p>{{carbs}}</p>
+  Fat:<p>{{fat}}</p>
+  Protein:<p>{{protein}}</p>
+
+
   <button>Complete Challenge</button>
+
 
   <!-- <h3>Input Your Ingredients:</h3>
   <span>
