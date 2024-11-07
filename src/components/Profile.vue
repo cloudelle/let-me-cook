@@ -45,22 +45,7 @@ async function getUserData(uid) {
   }
 }
 
-// Function to add ingredient
-async function addIngredient() {
-  if (documentId.value) {
-    try {
-      const docRef = doc(db, "ingredients", documentId.value);
-      await updateDoc(docRef, {
-        ingredient: arrayUnion(ingredient.value)
-      });
-      console.log("Ingredient added: ", ingredient.value);
-    } catch (e) {
-      console.error("Error adding ingredient: ", e);
-    }
-  } else {
-    console.error("No document ID found.");
-  }
-}
+
 
 async function displayActiveChallenge() {
   if (userActiveChallenge.value != "") {
@@ -108,6 +93,26 @@ onMounted(() => {
     }
   });
 });
+
+
+// // Function to add ingredient
+// async function addIngredient() {
+//   if (documentId.value) {
+//     try {
+//       const docRef = doc(db, "ingredients", documentId.value);
+//       await updateDoc(docRef, {
+//         ingredient: arrayUnion(ingredient.value)
+//       });
+//       console.log("Ingredient added: ", ingredient.value);
+//     } catch (e) {
+//       console.error("Error adding ingredient: ", e);
+//     }
+//   } else {
+//     console.error("No document ID found.");
+//   }
+// }
+
+
 </script>
 
 <template>

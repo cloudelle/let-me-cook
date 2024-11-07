@@ -14,10 +14,10 @@ const firebaseConfig = {
     apiKey: "AIzaSyD4t9Ulylj6RKodtw8hram5RYykaU-Hs_s",
     authDomain: "let-me-cook-a6cd6.firebaseapp.com",
     projectId: "let-me-cook-a6cd6",
-    storageBucket: "let-me-cook-a6cd6.appspot.com",
+    storageBucket: "let-me-cook-a6cd6.firebasestorage.app",
     messagingSenderId: "175589138122",
     appId: "1:175589138122:web:1883b9686d8efeb360de33"
-};
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
