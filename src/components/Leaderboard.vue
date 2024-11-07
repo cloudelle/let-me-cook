@@ -3,6 +3,7 @@
   import { onAuthStateChanged } from 'firebase/auth';
   import { auth } from '../firebase.js';
   import { useRouter } from "vue-router";
+  import { db } from '../firebase.js';
   import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 
   const router = useRouter();

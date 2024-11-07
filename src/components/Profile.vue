@@ -2,11 +2,9 @@
 import axios from "axios";
 import { ref, onMounted } from 'vue';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useRouter } from 'vue-router';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '../firebase.js';
-
-const router = useRouter();
+import router from '../router'; // (new) Import the router instance from index.js
 
 
 // Define reactive variables
@@ -25,7 +23,7 @@ const steps = ref('');
 const ingredients = ref('');
 const calories = ref('');
 const carbs = ref('');
-const fat  = ref('');
+const fat = ref('');
 const protein = ref('');
 
 
@@ -51,29 +49,9 @@ async function getUserData(uid) {
   }
 }
 
-// Function to add ingredient
-async function addIngredient() {
 
-  if (documentId.value) {
-    try {
-      const docRef = doc(db, "ingredients", documentId.value);
-
-      await updateDoc(docRef, {
-        ingredient: arrayUnion(ingredient.value)
-      });
-
-      console.log("Ingredient added: ", ingredient.value);
-    } catch (e) {
-      console.error("Error adding ingredient: ", e);
-    }
-  } else {
-    console.error("No document ID found.");
-  }
-}
 
 async function displayActiveChallenge() {
-
-
   if (userActiveChallenge.value != "") {
 
     var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=f22b8ffb2f4f476fb33831a32e903b77"
@@ -84,11 +62,11 @@ async function displayActiveChallenge() {
         console.log(response.data);
         recipeTitle.value = response.data.title
         recipeImg.value = response.data.image
-        
+
         description.value = response.data.summary
         if (response.data.analyzedInstructions.length > 0) {
           // console.log("testing")
-          recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes 
+          recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes
           steps.value = response.data.analyzedInstructions[0].steps
         }
         else {
@@ -101,19 +79,18 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
-      var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=f88baf2ecf9a4eab92a25613785c4ba1"
-      axios.get(ingredientUrl)
+    var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=f88baf2ecf9a4eab92a25613785c4ba1"
+    axios.get(ingredientUrl)
       .then(response => {
-        ingredients.value = response.data.ingredients
-        console.log(ingredients.value);
+        ingredients.value = response.data.ingredients;
       })
       .catch(error => {
         console.log(error.message);
       });
 
 
-      var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=f22b8ffb2f4f476fb33831a32e903b77"
-      axios.get(nutritionUrl)
+    var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=f22b8ffb2f4f476fb33831a32e903b77"
+    axios.get(nutritionUrl)
       .then(response => {
         calories.value = response.data.calories
         carbs.value = response.data.carbs
@@ -126,12 +103,19 @@ async function displayActiveChallenge() {
         console.log(error.message);
       });
 
-      // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
-      // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
-      // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
+    // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
+    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
+    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
 
-  }else {
-    var active = False
+  }
+}
+
+// Function to complete challenge and redirect
+function completeChallenge() {
+  if (userActiveChallenge.value) {
+    router.push({ name: 'Social' }); // Redirect to Social page by name
+  } else {
+    alert('No active challenge to complete.');
   }
 }
 
@@ -146,29 +130,49 @@ onMounted(() => {
     }
   });
 });
+
+
+// // Function to add ingredient
+// async function addIngredient() {
+//   if (documentId.value) {
+//     try {
+//       const docRef = doc(db, "ingredients", documentId.value);
+//       await updateDoc(docRef, {
+//         ingredient: arrayUnion(ingredient.value)
+//       });
+//       console.log("Ingredient added: ", ingredient.value);
+//     } catch (e) {
+//       console.error("Error adding ingredient: ", e);
+//     }
+//   } else {
+//     console.error("No document ID found.");
+//   }
+// }
+
+
 </script>
 
 <template>
   <br />
   <h1>Active Challenges</h1>
   <br>
-  <b><u>{{recipeTitle}}</u></b>
+  <b><u>{{ recipeTitle }}</u></b>
   <p v-html="description"></p>
   <br>
-  <p>Score: {{recipeScore}}</p>
+  <p>Score: {{ recipeScore }}</p>
   <img v-bind:src="recipeImg" alt="">
   <br>
-<div v-if="steps && steps.length">
-  <h3>Recipe Steps:</h3>
-  <ol>
-  <li v-for="(step, index) in steps" :key="index">
-    {{ index + 1 }}. {{ step.step }}
-  </li>
-  </ol>
-</div>
+  <div v-if="steps && steps.length">
+    <h3>Recipe Steps:</h3>
+    <ol>
+      <li v-for="(step, index) in steps" :key="index">
+        {{ index + 1 }}. {{ step.step }}
+      </li>
+    </ol>
+  </div>
 
-  
-    <br>
+
+  <br>
   <div v-if="ingredients && ingredients.length">
     <h3>Ingredients:</h3>
     <ol>
@@ -180,16 +184,16 @@ onMounted(() => {
 
 
 
-  <br/>
+  <br />
   <br>
   <b><u>Nutrition Info</u></b><br>
-  Calories:<p>{{calories}}</p>
-  Carbs:<p>{{carbs}}</p>
-  Fat:<p>{{fat}}</p>
-  Protein:<p>{{protein}}</p>
+  Calories:<p>{{ calories }}</p>
+  Carbs:<p>{{ carbs }}</p>
+  Fat:<p>{{ fat }}</p>
+  Protein:<p>{{ protein }}</p>
 
 
-  <button>Complete Challenge</button>
+  <button @click="completeChallenge">Complete Challenge</button>
 
 
   <!-- <h3>Input Your Ingredients:</h3>

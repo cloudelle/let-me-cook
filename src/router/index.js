@@ -6,13 +6,14 @@ import Login from "../components/Login.vue"
 import Profile from "../components/Profile.vue"
 import Start from "../components/Start.vue"
 import Leaderboard from "../components/Leaderboard.vue"
+import Social from '../components/Social.vue'; 
 
 const routes = [
-    {
-        path: "/",
-        name: "About",
-        component: About,
-    },
+  {
+    path: "/",
+    name: "About",
+    component: About,
+  },
   {
     path: "/dashboard",
     name: "Dashboard",
@@ -46,11 +47,16 @@ const routes = [
     name: "Leaderboard",
     component: Leaderboard,
   },
+  {
+    path: '/social', 
+    name: 'Social', 
+    component: Social, 
+  },
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes
 })
 
 export default router

@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDoc, getDocs, setDoc, addDoc, doc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getStorage } from "firebase/storage"; 
 import router from "./router";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -13,21 +14,20 @@ const firebaseConfig = {
     apiKey: "AIzaSyD4t9Ulylj6RKodtw8hram5RYykaU-Hs_s",
     authDomain: "let-me-cook-a6cd6.firebaseapp.com",
     projectId: "let-me-cook-a6cd6",
-    storageBucket: "let-me-cook-a6cd6.appspot.com",
+    storageBucket: "let-me-cook-a6cd6.firebasestorage.app",
     messagingSenderId: "175589138122",
     appId: "1:175589138122:web:1883b9686d8efeb360de33"
-};
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 const user = auth.currentUser;
 
 
-
-export { auth }
-export { db, app }
+export { auth, db, app, storage };
 
 // Get list of users from database
 export async function getUsers() {
