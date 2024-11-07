@@ -136,8 +136,8 @@ export default {
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
       //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
+      //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
       //apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
       //apikey: "32c5a4b096014b22957dc323d87d263f",
@@ -176,8 +176,8 @@ export default {
     },
     calcScore(recipeCalc) {
       return (
-        (recipeCalc.readyInMinutes || 0) *
-        ((recipeCalc.analyzedInstructions?.[0]?.steps || []).length)
+        (recipeCalc.readyInMinutes || 1) *
+        ((recipeCalc.analyzedInstructions?.[0]?.steps?.length ?? 1))
       );
     },
     async stepsCalc(stepsRecp) {

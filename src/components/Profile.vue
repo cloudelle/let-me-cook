@@ -84,9 +84,18 @@ async function displayActiveChallenge() {
         console.log(response.data);
         recipeTitle.value = response.data.title
         recipeImg.value = response.data.image
-        recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes 
+        
         description.value = response.data.summary
-        steps.value = response.data.analyzedInstructions[0].steps
+        if (response.data.analyzedInstructions.length > 0) {
+          // console.log("testing")
+          recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes 
+          steps.value = response.data.analyzedInstructions[0].steps
+        }
+        else {
+          // console.log("no instruction")
+          recipeScore.value = response.data.readyInMinutes
+        }
+
       })
       .catch(error => {
         console.log(error.message);
@@ -149,13 +158,15 @@ onMounted(() => {
   <p>Score: {{recipeScore}}</p>
   <img v-bind:src="recipeImg" alt="">
   <br>
-
+<div v-if="steps && steps.length">
   <h3>Recipe Steps:</h3>
   <ol>
   <li v-for="(step, index) in steps" :key="index">
     {{ index + 1 }}. {{ step.step }}
   </li>
   </ol>
+</div>
+
   
     <br>
   <div v-if="ingredients && ingredients.length">
