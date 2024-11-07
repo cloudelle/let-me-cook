@@ -22,6 +22,32 @@ onMounted(() => {
   getTrendingRecipes(apiUrl);
 });
 
+
+const faqs = ref([
+  {
+    question: "What types of recipes can I expect to find on Let Me Cook?",
+    answer:
+      "Our recipe library spans a variety of cuisines and meal types, including appetizers, main courses, desserts, and healthy options. The recommendations are dynamically tailored to your ingredients, so you might discover anything from simple comfort foods to more elaborate dishes that make use of pantry staples and fresh produce alike.",
+    open: false,
+  },
+  {
+    question: "How do I earn points?",
+    answer:
+      "By participating in challenges! Input your ingredients, choose a challenge, cook up the recipe given and you'll earn it!",
+    open: false,
+  },
+  {
+    question: "Can I share my own recipes or meals?",
+    answer:
+      "Yes! You can post pictures and details of your meals on the socials page to share with the community. Alternatively, you can also head to the socials page to get inspiration from other food enthusiasts and interact with them 😁",
+    open: false,
+  },
+]);
+
+function toggleFaq(index) {
+  faqs.value[index].isActive = !faqs.value[index].isActive;
+}
+
 </script>
 
 <template>
@@ -103,7 +129,7 @@ onMounted(() => {
             <div class="socials-text p-5">
               <h1>Cook, Share & Connect!</h1>
               <p>Show off your culinary creations! At "Socials", you can share recipes, browse inspiring meals, and connect with fellow food lovers. Like posts, spark new ideas, and fuel your cooking adventures with a community that celebrates creativity in the kitchen. Ready to share and get inspired?</p>
-              <router-link to=""> 
+              <router-link to="/social"> 
                 <button class="bg-blue-500 text-white text-lg px-6 py-3 rounded-lg hover:bg-blue-600">Go to Socials</button>
               </router-link>
             </div>
@@ -119,63 +145,27 @@ onMounted(() => {
 
 <!-- FAQs -->
 <div class="faq-background">
-<section class="faq">
-  <h1 class="mb-4 faq-header">FAQs</h1>
-
-  <div class="faq-body">
-    <div class="question">
-      <h3>What types of recipes can I expect to find on Let Me Cook?</h3>
-
-      <svg width="20" height="10" viewBox="0 0 42 25">
-        <path d="M3 3L21 21L39 3" stroke="white" stroke-width="1" stroke-linecap="round"/>
-      </svg>
-    </div>
-
-    <div class="answer">
-      <p>
-        Our recipe library spans a variety of cuisines and meal types, including appetizers, main courses, desserts, and healthy options. The recommendations are dynamically tailored to your ingredients, so you might discover anything from simple comfort foods to more elaborate dishes that make use of pantry staples and fresh produce alike.
-      </p>
-    </div>
+    <section class="faq">
+      <h1 class="mb-4 faq-header">FAQs</h1>
+      <div v-for="(faq, index) in faqs" :key="index" class="faq-body" @click="toggleFaq(index)">
+        <div class="question">
+          <h3>{{ faq.question }}</h3>
+          <svg width="20" height="10" viewBox="0 0 42 25">
+            <path d="M3 3L21 21L39 3" stroke="black" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="answer" v-show="faq.isActive">
+          <p>{{ faq.answer }}</p>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div class="faq-body">
-    <div class="question">
-      <h3>How do I earn points?</h3>
-
-      <svg width="20" height="10" viewBox="0 0 42 25">
-        <path d="M3 3L21 21L39 3" stroke="white" stroke-width="1" stroke-linecap="round"/>
-      </svg>
-    </div>
-
-    <div class="answer">
-      <p>
-        By participating in challenges! Input your ingredients, choose a challenge, cook up the recipe given and you'll earn it!
-      </p>
-    </div>
-  </div>
-
-  <div class="faq-body">
-    <div class="question">
-      <h3>Can I share my own recipes or meals?</h3>
-
-      <svg width="20" height="10" viewBox="0 0 42 25">
-        <path d="M3 3L21 21L39 3" stroke="white" stroke-width="1" stroke-linecap="round"/>
-      </svg>
-    </div>
-
-    <div class="answer">
-      <p>
-        Yes! You can post pictures and details of your meals on the socials page to share with the community. Alternatively, you can also head to the socials page to get inspiration from other food enthusiasts and interact with them 😁
-      </p>
-    </div>
-  </div>
-</section>
-</div>
 </div>
 
 </template>
 
-<script>
+<!-- <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.faq-body').forEach((faq) => {
       faq.addEventListener('click', () => {
@@ -189,7 +179,7 @@ onMounted(() => {
       });
     });
   });
-</script>
+</script> -->
 
 <style scoped>
 
@@ -438,12 +428,11 @@ h1 {
 }
 
 .faq-background {
- background-color: rgb(235, 235, 235);
- padding-bottom: 50px;
+  background-color: rgb(235, 235, 235);
+  padding-bottom: 50px;
 }
 
 .faq {
-  height: 100%;
   width: 80%;
   margin: 0 auto;
   display: flex;
@@ -453,10 +442,9 @@ h1 {
 }
 
 .faq-body {
-  max-width: 700px;
-  margin-top: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid grey;
+  width: 100%;
+  padding: 1rem 0;
+  border-bottom: 1px solid grey; /* Uniform underline */
   cursor: pointer;
 }
 
@@ -471,8 +459,13 @@ h1 {
 }
 
 .answer {
-  max-height: 0;
-  overflow: hidden;
+  padding-top: 1rem;
+  line-height: 1.6;
+  font-size: 20px;
+}
+.rotate-icon {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
 }
 
 .answer p {
