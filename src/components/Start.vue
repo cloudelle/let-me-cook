@@ -65,7 +65,8 @@ import { useAuth } from '../composables/useAuth.js';
   </section>
 
   <div id="recipe-list">
-    <h1>Your suggested recipes!</h1>
+    <h1 v-if="selectedIngredients.length >0">Your suggested recipes!</h1>
+    <h1 v-else>Trending Recipes!</h1>
     <div v-for="recipe in recipes" :key="recipe.id" class="recipe" @click="openModal(recipe); stepsCalc(recipe)">
       <img :src="recipe.image" :alt="recipe.title" class="image-container-wrapper" />
       <div class="recipe-content">
