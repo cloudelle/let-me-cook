@@ -11,65 +11,70 @@ import { useAuth } from '../composables/useAuth.js';
 
 
 <template>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merienda">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
   <section class="heading row">
     <h1>Challenges</h1>
 
-  <section class="ingredients">
-    <!-- Input for typing ingredients -->
-    <!-- <div class="container-fluid">
+    <section class="ingredients">
+      <!-- Input for typing ingredients -->
+      <!-- <div class="container-fluid">
       <div class="row"> -->
-        <div class="type-ingredient">
-          <span class="search-icon" style="font-family: Outfit, FontAwesome;">&#xf002;</span>
-          <input v-model="typedIngredient" @input="fetchIngredientsDebounced" id="ingredient-input" type="text" placeholder="Enter Your Ingredient" style="font-family: Outfit, FontAwesome;"/>
-          <span>
-            <button v-if="typedIngredient" class="clear-button" @click="clearInput" style="font-family: Outfit, FontAwesome; ">&#xf00d;</button>
-          </span>
-        </div>
-        <!-- Dropdown for suggested ingredients -->
-        <div class="suggested-ingredient">
-          <ul v-if="suggestedIngredients.length && typedIngredient">
-            <li v-for="(ingredient, index) in suggestedIngredients" :key="index" @click="selectIngredient(ingredient)">
-              {{ ingredient.name }}
-            </li>
-          </ul>
-        </div>
+      <div class="type-ingredient">
+        <span class="search-icon" style="font-family: Outfit, FontAwesome;">&#xf002;</span>
+        <input v-model="typedIngredient" @input="fetchIngredientsDebounced" id="ingredient-input" type="text"
+          placeholder="Enter Your Ingredient" style="font-family: Outfit, FontAwesome;" />
+        <span>
+          <button v-if="typedIngredient" class="clear-button" @click="clearInput"
+            style="font-family: Outfit, FontAwesome; ">&#xf00d;</button>
+        </span>
+      </div>
+      <!-- Dropdown for suggested ingredients -->
+      <div class="suggested-ingredient">
+        <ul v-if="suggestedIngredients.length && typedIngredient">
+          <li v-for="(ingredient, index) in suggestedIngredients" :key="index" @click="selectIngredient(ingredient)">
+            {{ ingredient.name }}
+          </li>
+        </ul>
+      </div>
       <!-- </div>
     </div> -->
 
-    <!-- Selected Ingredients List -->
-    <div class="selected-ingredient">
-      <div v-if="selectedIngredients.length">
-        <!-- <h3>Selected Ingredients:</h3> -->
-        <div class="sel-ingredients">
-          <ul>
-            <li v-for="(ingredient, index) in selectedIngredients" :key="index">
-              {{ ingredient }}
-              <button @click="removeIngredient(ingredient,index)">X</button>
-            </li>
-          </ul>
+      <!-- Selected Ingredients List -->
+      <div class="selected-ingredient">
+        <div v-if="selectedIngredients.length">
+          <!-- <h3>Selected Ingredients:</h3> -->
+          <div class="sel-ingredients">
+            <ul>
+              <li v-for="(ingredient, index) in selectedIngredients" :key="index">
+                {{ ingredient }}
+                <button @click="removeIngredient(ingredient, index)">X</button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-</section>
+  </section>
 
   <div id="recipe-list">
     <h1>Your suggested recipes!</h1>
-    <div v-for="recipe in recipes" :key="recipe.id" class="recipe" @click="openModal(recipe)">
-      <img :src="recipe.image" :alt="recipe.title" class="image-container-wrapper"/>
+    <div v-for="recipe in recipes" :key="recipe.id" class="recipe" @click="openModal(recipe); stepsCalc(recipe)">
+      <img :src="recipe.image" :alt="recipe.title" class="image-container-wrapper" />
       <div class="recipe-content">
         <h3>{{ recipe.title }}</h3>
         <p></p>
         <div class="recipe-score">
           <h4>Score</h4>
           <!-- change scoring system, this is just template for now -->
-          <p>{{ Math.round(recipe.spoonacularScore) }}</p>
+          <p>{{ calcScore(recipe) }}</p>
         </div>
 
         <div>
@@ -96,23 +101,28 @@ import { useAuth } from '../composables/useAuth.js';
       <p>Fat: {{ selectedRecipe.nutrition.nutrients[1].amount }}g</p>
       <p>Carbohydrates: {{ selectedRecipe.nutrition.nutrients[3].amount }}g</p>
       <p>Protein: {{ selectedRecipe.nutrition.nutrients[10].amount }}g</p>
+      <ul>Ingredients Required:
+        <li v-for="(steps,idx) in stepsIngredient" :key="idx">{{ (idx+1) + ") " + steps.name.charAt(0).toUpperCase() + steps.name.slice(1)}}</li>
+      </ul>
       <button @click="closeModal" style="background-color:rgb(255, 157, 101); font-weight: 700;">Close</button>
-      <button @click="addChallenge(selectedRecipe)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START CHALLENGE!</button>
+      <button @click="addChallenge(selectedRecipe)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START
+        CHALLENGE!</button>
     </div>
   </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" ref="toastRef">
-    <div class="toast-header">
-      <!-- <img src="..." class="rounded me-2" alt="..."> -->
-      <strong class="me-auto">Challenge Added!</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      Successfully added {{ selectedChallenge }}! Click <router-link to="/Profile">here</router-link> to view the details!
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" ref="toastRef">
+      <div class="toast-header">
+        <!-- <img src="..." class="rounded me-2" alt="..."> -->
+        <strong class="me-auto">Challenge Added!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Successfully added {{ selectedChallenge }}! Click <router-link to="/Profile">here</router-link> to view the
+        details!
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -126,24 +136,27 @@ export default {
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
       //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      //apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      apiKey: "739a15dee8b84c5187535bfa56e19ccb",
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       //apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
-      apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
+      //apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
+      //apikey: "32c5a4b096014b22957dc323d87d263f",
       numberOfRecipes: 10, // Number of recipes to display
       recipes: [],
       documentId: null,
       loadingData: true,
       isModalVisible: false,
       selectedRecipe: {},
-      uid : null,
-      selectedChallenge : null,
+      uid: null,
+      selectedChallenge: null,
       toast: null,
+      stepsIngredient: null,
       // apiUrl: `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`
 
     };
   },
   computed: {
+
   },
   methods: {
     // Debounced function to fetch ingredients after typing stops
@@ -161,12 +174,29 @@ export default {
         this.toast.show()
       }
     },
+    calcScore(recipeCalc) {
+      return (
+        (recipeCalc.readyInMinutes || 0) *
+        ((recipeCalc.analyzedInstructions?.[0]?.steps || []).length)
+      );
+    },
+    async stepsCalc(stepsRecp) {
+      axios.get("https://api.spoonacular.com/recipes/" + stepsRecp.id + "/ingredientWidget.json?apiKey=" + this.apiKey)
+      .then(response => {
+        this.stepsIngredient = response.data.ingredients
+        console.log(this.stepsIngredient)
+      })
+      .catch(e => {
+        console.log(e.message)
+      })
+    },
+
     async addChallenge(challengeId) {
       console.log(this.uid)
       console.log(challengeId)
       this.selectedChallenge = challengeId.title
       try {
-        const challengeDocRef = doc(db,"user",this.uid)
+        const challengeDocRef = doc(db, "user", this.uid)
         await updateDoc(challengeDocRef, {
           activeChallenge: challengeId.id
         })
@@ -174,7 +204,7 @@ export default {
         this.showToast()
 
       }
-      catch(e) {
+      catch (e) {
         console.log(e)
       }
       this.closeModal()
@@ -220,7 +250,7 @@ export default {
       }
     },
     // Remove an ingredient from the selected list
-    async removeIngredient(ingredient,index) {
+    async removeIngredient(ingredient, index) {
       const removeDocRef = doc(db, "ingredients", this.uid);
       try {
         await updateDoc(removeDocRef, {
@@ -233,43 +263,41 @@ export default {
       }
     },
     fetchRecipes() {
-      const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${this.numberOfRecipes}&addRecipeInformation=true&includeIngredients=${this.selectedIngredients.join(',')}&addRecipeNutrition=true&apiKey=${this.apiKey}`
+      const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${this.numberOfRecipes}&addRecipeInformation=true&addRecipeInstructions=true&includeIngredients=${this.selectedIngredients.join(',')}&addRecipeNutrition=true&apiKey=${this.apiKey}`
       axios.get(apiUrl)
         .then(response => {
-          console.log(response.data.results)
           this.recipes = response.data.results
-          //why isnt this updating wtf
-          // this.getDocumentId()
+          console.log(response.data)
         })
         .catch(error => {
           console.log(error.message)
         })
     },
     async getDocumentId() {
-  try {
-      
-      // Check if ingredientId exists
-      if (this.uid) {
-        const docRef = doc(db, "ingredients", this.uid);
-        const docSnap = await getDoc(docRef);
+      try {
 
-        // Check if the ingredients document exists
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          this.loadingData = true; // Set loading flag to true
-          this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
-          this.loadingData = false; // Set loading flag to false after update
-        } else {
-          console.log("No ingredients document found for the provided documentId.");
+        // Check if ingredientId exists
+        if (this.uid) {
+          const docRef = doc(db, "ingredients", this.uid);
+          const docSnap = await getDoc(docRef);
+
+          // Check if the ingredients document exists
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            this.loadingData = true; // Set loading flag to true
+            this.selectedIngredients = data.ingredient || []; // Update selectedIngredients
+            this.loadingData = false; // Set loading flag to false after update
+          } else {
+            console.log("No ingredients document found for the provided documentId.");
+          }
         }
+      } catch (e) {
+        console.error("Error getting document ID: ", e);
       }
-  } catch (e) {
-    console.error("Error getting document ID: ", e);
-  }
-},
-  clearInput() {
-    this.typedIngredient = '';
-  }
+    },
+    clearInput() {
+      this.typedIngredient = '';
+    }
     // async fetchDocumentData() {
     //     const docRef = doc(db, "ingredients", this.documentId);
     //     const docSnap = await getDoc(docRef);
@@ -328,19 +356,19 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
-.heading h1{
+.heading h1 {
   font-size: 45px;
   font-weight: bold;
   font-family: "Merienda", serif;
   text-align: center;
   color: rgb(0, 0, 0);
   letter-spacing: 6px;
-  
+
   padding: 40px;
   /* background-color: rgb(255, 243, 234); */
 }
 
-.heading  {
+.heading {
   background-color: rgb(235, 235, 235);
 }
 
@@ -381,17 +409,20 @@ export default {
 }
 
 .clear-button {
-  right: 10px; /* Adjust this value as needed */
+  right: 10px;
+  /* Adjust this value as needed */
   /* background: none; */
   border: none;
   cursor: pointer;
-  font-size: 150%; /* Adjust size as needed */
+  font-size: 150%;
+  /* Adjust size as needed */
   padding-left: 5px;
   color: rgb(165, 165, 165);
 }
 
 .clear-button:hover {
-  color: #6a6a6a; /* Hover color */
+  color: #6a6a6a;
+  /* Hover color */
 }
 
 .type-ingredient input {
@@ -409,7 +440,8 @@ export default {
   position: relative;
   width: 50%;
   margin: auto;
-  top: 100%; /* Aligns right below the input */
+  top: 100%;
+  /* Aligns right below the input */
   background-color: #ffffff;
   border: 1px solid #ccc;
   border-top: none;
@@ -439,7 +471,7 @@ export default {
   margin-bottom: 30px;
 }
 
-.sel-ingredients ul{
+.sel-ingredients ul {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 0;
@@ -462,7 +494,7 @@ export default {
   padding: 8px 10px;
   text-align: center;
   justify-content: center;
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 button {
@@ -490,18 +522,19 @@ button {
 
 .recipe img {
   width: 30%;
-  height: auto; 
+  height: auto;
   border-radius: 8px;
   margin-right: 20px;
   min-height: 30vh;
-  display: block; 
-  object-fit: cover; 
-  overflow: hidden; 
+  display: block;
+  object-fit: cover;
+  overflow: hidden;
 }
 
 .recipe-content {
   max-width: 600px;
 }
+
 .recipe-content h4 {
   font-size: large;
   color: rgb(255, 157, 101);
@@ -529,6 +562,7 @@ button {
   margin: 0;
   color: #555;
 }
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -540,7 +574,7 @@ button {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  
+  overflow: hidden;
 }
 
 .modal-content {
@@ -549,7 +583,21 @@ button {
   border-radius: 8px;
   width: 400px;
   max-width: 80%;
+  max-height: 80vh;
+  overflow-y: auto;
   text-align: center;
+}
+.modal-content ul {
+  list-style-type: none;
+  padding: 0; 
+  margin: 10px 0; 
+  text-align: center; 
+  width: 100%; 
+}
+.modal-content ul li {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0; 
 }
 
 .modal-content img {
