@@ -6,7 +6,8 @@ import Login from "../components/Login.vue"
 import Profile from "../components/Profile.vue"
 import Start from "../components/Start.vue"
 import Leaderboard from "../components/Leaderboard.vue"
-import Social from '../components/Social.vue'; 
+import Social from '../components/Social.vue';
+import Dashboard from "../components/Dashboard.vue";
 
 const routes = [
   {
@@ -46,9 +47,15 @@ const routes = [
     meta: { requiresAuth: true }, // Protect this route
   },
   {
-    path: '/social', 
-    name: 'Social', 
-    component: Social, 
+    path: '/social',
+    name: 'Social',
+    component: Social,
+    meta: { requiresAuth: true }, // Protect this route
+  }, 
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
     meta: { requiresAuth: true }, // Protect this route
   },
 ]
