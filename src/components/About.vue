@@ -8,7 +8,7 @@ const router = useRouter(); // Initialize the router
 
 // API key and URL for Spoonacular API
 //const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key f88baf2ecf9a4eab92a25613785c4ba1
-const apiKey = "";
+const apiKey = "739a15dee8b84c5187535bfa56e19ccb";
 const numberOfRecipes = 6; // Number of recipes to display
 const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`;
 
@@ -31,17 +31,17 @@ onMounted(() => {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
-<div class="page-background row">
+<div class="page-background ">
   <section class="getStarted">
     <div class="image-container-wrapper row">
         <div class="image-container">
 
-            <div class="text-overlay">
-                <h1 class="title">Get Started!</h1>
-                <p class="description">
-                    Welcome to <span class="logo-name" style="font-weight: bold; font-style: italic;">Let Me Cook</span>, your go-to platform for personalised recipe discovery! Get meal ideas based on ingredients you already have, take on cooking challenges to earn points, and climb the leaderboard. Share your creations, connect with other food lovers, and make cooking a fun, interactive experience. Let's get cooking!
-                </p>
-            </div>
+          <div class="text-overlay">
+              <h1 class="title">Get Started!</h1>
+              <p class="description">
+                  Welcome to <span class="logo-name" style="font-weight: bold; font-style: italic;">Let Me Cook</span>, your go-to platform for personalised recipe discovery! Get meal ideas based on ingredients you already have, take on cooking challenges to earn points, and climb the leaderboard. Share your creations, connect with other food lovers, and make cooking a fun, interactive experience. Let's get cooking!
+              </p>
+          </div>
         </div>
         
         <!-- Text Below Image for Small Screens - Will only show on smaller screens -->
@@ -52,7 +52,7 @@ onMounted(() => {
             </p>
         </div>
     </div>
-</section>
+  </section>
 
 <!-- Trending Recipes -->
 <div class="trending-background">
@@ -80,7 +80,7 @@ onMounted(() => {
 <!-- Challenges -->
  <section class="features">
     <div class="container-fluid p-0">
-      <div class="row mt-5 ">
+      <div class="row mt-5">
         <div class="col-md-6 g-0 d-flex">
           <div class="challenge-img px-2">
             <img src="../../images/challenge.webp" class="img-fluid">
@@ -103,7 +103,7 @@ onMounted(() => {
             <div class="socials-text p-5">
               <h1>Cook, Share & Connect!</h1>
               <p>Show off your culinary creations! At "Socials", you can share recipes, browse inspiring meals, and connect with fellow food lovers. Like posts, spark new ideas, and fuel your cooking adventures with a community that celebrates creativity in the kitchen. Ready to share and get inspired?</p>
-              <router-link to=""> 
+              <router-link to="/social"> 
                 <button class="bg-blue-500 text-white text-lg px-6 py-3 rounded-lg hover:bg-blue-600">Go to Socials</button>
               </router-link>
             </div>
@@ -195,6 +195,7 @@ onMounted(() => {
 
 .page-background {
   background-color: white;
+  overflow: hidden;
 }
 .getStarted .title {
   color: black;
@@ -358,6 +359,7 @@ h1 {
   text-align: center;
   width: 70%;
   margin: auto;
+  padding-top: 30px;
 }
 
  .recipe {

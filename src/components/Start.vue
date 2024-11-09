@@ -15,7 +15,9 @@ import { useAuth } from '../composables/useAuth.js';
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merienda">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <section class="page">
   <section class="heading row">
     <h1>Challenges</h1>
 
@@ -100,6 +102,7 @@ import { useAuth } from '../composables/useAuth.js';
       <button @click="addChallenge(selectedRecipe.id)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START CHALLENGE!</button>
     </div>
   </div>
+</section>
 </template>
 
 <script>
@@ -113,7 +116,7 @@ export default {
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
       // apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      apiKey: "739a15dee8b84c5187535bfa56e19ccb", //af8d927cc09d4e718de7f8b37b6faec8
+      apiKey: "cdbd83399ef34b0d9cd4c87cc449e092", //af8d927cc09d4e718de7f8b37b6faec8
       //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       numberOfRecipes: 5, // Number of recipes to display
       recipes: [],
@@ -312,6 +315,10 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
+.page {
+  overflow: hidden;
+}
+
 .heading h1{
   font-size: 45px;
   font-weight: bold;
@@ -350,6 +357,9 @@ export default {
   margin: auto;
   transition: box-shadow 0.25s;
   background-color: white;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-right:7px;
 }
 
 .type-ingredient:focus-within {
