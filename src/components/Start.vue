@@ -14,11 +14,11 @@ import { useAuth } from '../composables/useAuth.js';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merienda">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <section class="page">
   <section class="heading row">
     <h1>Challenges</h1>
 
@@ -124,6 +124,7 @@ import { useAuth } from '../composables/useAuth.js';
       </div>
     </div>
   </div>
+</section>
 </template>
 
 <script>
@@ -357,7 +358,11 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
-.heading h1 {
+.page {
+  overflow: hidden;
+}
+
+.heading h1{
   font-size: 45px;
   font-weight: bold;
   font-family: "Merienda", serif;
@@ -395,6 +400,9 @@ export default {
   margin: auto;
   transition: box-shadow 0.25s;
   background-color: white;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-right:7px;
 }
 
 .type-ingredient:focus-within {
