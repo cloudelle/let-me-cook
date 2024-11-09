@@ -92,9 +92,9 @@ onUnmounted(() => {
                 exact-active-class="text-tomato">Login</router-link>
             </li>
             <li v-if="isLoggedIn">
-              <router-link to="/Profile" @click="closeMenu"
+              <router-link to="/mychallenge" @click="closeMenu"
                 class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline" active-class="text-tomato"
-                exact-active-class="text-tomato">Profile</router-link>
+                exact-active-class="text-tomato">My Challenge</router-link>
             </li>
             <li v-if="isLoggedIn">
               <router-link to="/Start" @click="closeMenu"
@@ -110,6 +110,11 @@ onUnmounted(() => {
               <router-link to="/leaderboard" @click="closeMenu"
                 class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline" active-class="text-tomato"
                 exact-active-class="text-tomato">Leaderboard</router-link>
+            </li>
+            <li v-if="isLoggedIn">
+              <router-link to="/profile" @click="closeMenu"
+                class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline" active-class="text-tomato"
+                exact-active-class="text-tomato">Profile</router-link>
             </li>
 
             <!-- Sign Out button in mobile menu -->
@@ -136,8 +141,8 @@ onUnmounted(() => {
                 active-class="text-tomato" exact-active-class="text-tomato">Login</router-link>
             </li>
             <li v-if="isLoggedIn">
-              <router-link to="/Profile" class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline"
-                active-class="text-tomato" exact-active-class="text-tomato">Profile</router-link>
+              <router-link to="/mychallenge" class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline"
+                active-class="text-tomato" exact-active-class="text-tomato">My Challenge</router-link>
             </li>
             <li v-if="isLoggedIn">
               <router-link to="/Start" class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline"
@@ -150,6 +155,10 @@ onUnmounted(() => {
             <li v-if="isLoggedIn">
               <router-link to="/leaderboard" class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline"
                 active-class="text-tomato" exact-active-class="text-tomato">Leaderboard</router-link>
+            </li>
+            <li v-if="isLoggedIn">
+              <router-link to="/profile" class="py-2 text-gray-900 rounded hover:bg-gray-100 no-underline"
+                active-class="text-tomato" exact-active-class="text-tomato">Profile</router-link>
             </li>
           </ul>
         </div>

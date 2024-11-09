@@ -3,11 +3,11 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import About from "../components/About.vue"
 import Register from "../components/Register.vue"
 import Login from "../components/Login.vue"
-import Profile from "../components/Profile.vue"
+import MyChallenge from "../components/MyChallenge.vue"
 import Start from "../components/Start.vue"
 import Leaderboard from "../components/Leaderboard.vue"
 import Social from '../components/Social.vue';
-import Dashboard from "../components/Dashboard.vue";
+import Profile from "../components/Profile.vue";
 
 const routes = [
   {
@@ -29,9 +29,9 @@ const routes = [
   },
 
   {
-    path: "/profile",
-    name: "Profile",
-    component: Profile,
+    path: "/mychallenge",
+    name: "MyChallenge",
+    component: MyChallenge,
     meta: { requiresAuth: true }, // Protect this route
   },
   {
@@ -53,9 +53,9 @@ const routes = [
     meta: { requiresAuth: true }, // Protect this route
   }, 
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
     meta: { requiresAuth: true }, // Protect this route
   },
 ]

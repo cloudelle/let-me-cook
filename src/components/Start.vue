@@ -119,7 +119,7 @@ import { useAuth } from '../composables/useAuth.js';
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        Successfully added {{ selectedChallenge }}! Click <router-link to="/Profile">here</router-link> to view the
+        Successfully added {{ selectedChallenge }}! Click <router-link to="/mychallenge">here</router-link> to view the
         details!
       </div>
     </div>

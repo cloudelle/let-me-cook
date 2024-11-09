@@ -207,7 +207,7 @@ export default {
 
 
 #title {
-    margin-top: 40px;
+    padding-top: 20px;
     margin-bottom: 20px;
 }
 
