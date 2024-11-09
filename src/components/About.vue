@@ -440,7 +440,8 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 45px;
+  margin-top: 50px;
+  padding-top: 50px;
 }
 
 .faq-body {

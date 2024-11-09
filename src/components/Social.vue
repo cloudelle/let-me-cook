@@ -1,20 +1,20 @@
 <template>
-  <div>
+  <!-- <div> -->
     <!-- jewels new code starts here -->
     <!-- Display recipe title instead of challenge ID -->
-    <p v-if="recipeTitle">Challenge: {{ recipeTitle }}</p>
+    <!-- <p v-if="recipeTitle">Challenge: {{ recipeTitle }}</p>
 
-    <!-- File upload and caption input -->
-    <div v-if="selectedChallenge">
+      File upload and caption input -->
+    <!-- <div v-if="selectedChallenge">
       <input type="file" @change="onFileChange" />
-      <input type="text" v-model="caption" placeholder="Add a caption" />
+      <input type="text" v-model="caption" placeholder="Add a caption" /> -->
 
       <!-- Combined "Challenge Complete" button -->
-      <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
+      <!-- <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
         Challenge Complete
       </button>
     </div>
-  </div>
+  </div> -->
 
   <div class="posts-container">
     <h1>Posts</h1>
@@ -192,101 +192,101 @@ export default {
     },
 // jewels new codes end here
 
-    onFileChange(event) {
-      this.file = event.target.files[0];
-    },
-    async completeAndUploadChallenge() {
-      const user = getAuth().currentUser;
-      // Ensure file, caption, and selected challenge exist
-      if (!this.file || !this.caption || !this.selectedChallenge) {
-        alert('Please select a challenge, choose a file, and add a caption before completing.');
-        return;
-      }
+    // onFileChange(event) {
+    //   this.file = event.target.files[0];
+    // },
+    // async completeAndUploadChallenge() {
+    //   const user = getAuth().currentUser;
+    //   // Ensure file, caption, and selected challenge exist
+    //   if (!this.file || !this.caption || !this.selectedChallenge) {
+    //     alert('Please select a challenge, choose a file, and add a caption before completing.');
+    //     return;
+    //   }
 
-      try {
+    //   try {
 
-        // Generate a document ID for the post
-        const postsCollectionRef = collection(db, 'posts');
+    //     // Generate a document ID for the post
+    //     const postsCollectionRef = collection(db, 'posts');
 
-        const postDocRef = await addDoc(postsCollectionRef, {
-          challengeName: this.recipeTitle,
-          challengeScore: this.recipeScore,
-          userId: user.uid,
-          likes: 0,
-          caption: this.caption,
-          timestamp: serverTimestamp(),
-          likedBy: []
-        });
-        const documentId = postDocRef.id;
-        // Create a storage reference and upload the file
-        const fileRef = storageRef(storage, `uploads/${user.uid}/${documentId}`);
+    //     const postDocRef = await addDoc(postsCollectionRef, {
+    //       challengeName: this.recipeTitle,
+    //       challengeScore: this.recipeScore,
+    //       userId: user.uid,
+    //       likes: 0,
+    //       caption: this.caption,
+    //       timestamp: serverTimestamp(),
+    //       likedBy: []
+    //     });
+    //     const documentId = postDocRef.id;
+    //     // Create a storage reference and upload the file
+    //     const fileRef = storageRef(storage, `uploads/${user.uid}/${documentId}`);
 
-        // Upload the file
-        await uploadBytes(fileRef, this.file);
+    //     // Upload the file
+    //     await uploadBytes(fileRef, this.file);
 
-        // Get the file URL
-        const url = await getDownloadURL(fileRef);
-        console.log('File uploaded successfully:', url);
-        alert(`File uploaded successfully: ${url}`);
+    //     // Get the file URL
+    //     const url = await getDownloadURL(fileRef);
+    //     console.log('File uploaded successfully:', url);
+    //     alert(`File uploaded successfully: ${url}`);
 
-        // Mark challenge as complete in Firestore by clearing the activeChallenge field
-        if (user) {
-          const userDocRef = doc(db, 'user', user.uid);
-          const docSnap = await getDoc(userDocRef);
+    //     // Mark challenge as complete in Firestore by clearing the activeChallenge field
+    //     if (user) {
+    //       const userDocRef = doc(db, 'user', user.uid);
+    //       const docSnap = await getDoc(userDocRef);
 
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            this.currentScore = userData.points;
-          } else {
-            console.log('No such document!');
-          }
+    //       if (docSnap.exists()) {
+    //         const userData = docSnap.data();
+    //         this.currentScore = userData.points;
+    //       } else {
+    //         console.log('No such document!');
+    //       }
 
-          await updateDoc(userDocRef, {
-            points: this.currentScore + this.recipeScore,
-            activeChallenge: '' // Clear the active challenge after completion
-          });
-          location.reload();
-          alert('Challenge completed successfully!');
-        } else {
-          alert('User not authenticated.');
-        }
-      } catch (error) {
-        console.error('Error completing challenge or uploading file:', error);
-        alert('Failed to complete challenge. Please try again.');
-      }
-    },
-    async fetchActiveChallenge(uid) {
-      try {
-        const userDocRef = doc(db, 'user', uid);
-        const userDocSnap = await getDoc(userDocRef);
+    //       await updateDoc(userDocRef, {
+    //         points: this.currentScore + this.recipeScore,
+    //         activeChallenge: '' // Clear the active challenge after completion
+    //       });
+    //       location.reload();
+    //       alert('Challenge completed successfully!');
+    //     } else {
+    //       alert('User not authenticated.');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error completing challenge or uploading file:', error);
+    //     alert('Failed to complete challenge. Please try again.');
+    //   }
+    // },
+    // async fetchActiveChallenge(uid) {
+    //   try {
+    //     const userDocRef = doc(db, 'user', uid);
+    //     const userDocSnap = await getDoc(userDocRef);
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          this.selectedChallenge = userData.activeChallenge;
+    //     if (userDocSnap.exists()) {
+    //       const userData = userDocSnap.data();
+    //       this.selectedChallenge = userData.activeChallenge;
 
-          if (this.selectedChallenge) {
-            // Fetch recipe details for the active challenge
-            const recipeUrl = `https://api.spoonacular.com/recipes/${this.selectedChallenge}/information?includeNutrition=false&apiKey=${this.apiKey}`;
-            const response = await axios.get(recipeUrl);
-            this.recipeTitle = response.data.title;
-            this.recipeScore = response.data.readyInMinutes * response.data.analyzedInstructions[0].steps.length;
-          } else {
-            console.log("No active challenge found")
-          }
-        } else {
-          console.log('User document not found.');
-        }
-      } catch (e) {
-        console.error('Error fetching challenge:', e);
-      }
-    },
+    //       if (this.selectedChallenge) {
+    //         // Fetch recipe details for the active challenge
+    //         const recipeUrl = `https://api.spoonacular.com/recipes/${this.selectedChallenge}/information?includeNutrition=false&apiKey=${this.apiKey}`;
+    //         const response = await axios.get(recipeUrl);
+    //         this.recipeTitle = response.data.title;
+    //         this.recipeScore = response.data.readyInMinutes * response.data.analyzedInstructions[0].steps.length;
+    //       } else {
+    //         console.log("No active challenge found")
+    //       }
+    //     } else {
+    //       console.log('User document not found.');
+    //     }
+    //   } catch (e) {
+    //     console.error('Error fetching challenge:', e);
+    //   }
+    // },
   },
   mounted() {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.userid = user.uid
-        this.fetchActiveChallenge(user.uid); // Fetch active challenge details
+        // this.fetchActiveChallenge(user.uid); // Fetch active challenge details
         this.fetchPosts();
       } else {
         console.log('User not authenticated');
