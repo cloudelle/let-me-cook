@@ -1,168 +1,198 @@
 <script setup>
-import axios from "axios";
+import axios from 'axios';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { auth, db, storage } from '../firebase.js';
+import router from '../router';
 import { ref, onMounted } from 'vue';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { auth, db } from '../firebase.js';
-import router from '../router'; // (new) Import the router instance from index.js
+import { collection, orderBy, addDoc, doc, getDoc, updateDoc, query, getDocs, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+</script>
 
+<script>
+export default {
+  data() {
+    return {
+      //might wanna clean this up if got time, i think some not using anymore
+      userName: '',
+      userEmail: '',
+      userPoints: '',
+      userStreak: '',
+      userActiveChallenge: '',
+      ingredient: '',
+      documentId: null,
+      recipeImg: '',
+      recipeTitle: '',
+      recipeScore: '',
+      description: '',
+      steps: [],
+      ingredients: [],
+      calories: '',
+      carbs: '',
+      fat: '',
+      protein: '',
+      isModalVisible: false,
+      caption: '',
+      file: null,
+      currentScore: 0,
+      toastMessage: '',
+      isLoading: false,
+      timeTaken: '',
+      servings: '',
+    };
+  },
+  methods: {
+    formatTimestamp(timestamp) {
+      const date = new Date(timestamp.seconds * 1000);  
+      return date.toLocaleString();
+    },
+    openModal() {
+      this.isModalVisible = true;
+    },
+    closeModal() {
+      this.isModalVisible = false;
+    },
+    async getUserData(uid) {
+      try {
+        const docRef = doc(db, 'user', uid);
+        const docSnap = await getDoc(docRef);
 
-// Define reactive variables
-const userName = ref('');
-const userEmail = ref('');
-const userPoints = ref('');
-const userStreak = ref('');
-const userActiveChallenge = ref('');
-const ingredient = ref('');
-const documentId = ref(null);
-const recipeImg = ref('');
-const recipeTitle = ref('');
-const recipeScore = ref('');
-const description = ref('');
-const steps = ref('');
-const ingredients = ref('');
-const calories = ref('');
-const carbs = ref('');
-const fat = ref('');
-const protein = ref('');
-const timeTaken = ref('');
-const servings = ref('');
-
-
-async function getUserData(uid) {
-  try {
-    const docRef = doc(db, 'user', uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const userData = docSnap.data();
-      userName.value = userData.name;
-      userEmail.value = userData.email;
-      userPoints.value = userData.points;
-      userStreak.value = userData.streak;
-      userActiveChallenge.value = userData.activeChallenge;
-      documentId.value = uid;
-      displayActiveChallenge()
-    } else {
-      console.log('No such document!');
-    }
-  } catch (e) {
-    console.error('Error getting user document:', e);
-  }
-}
-
-
-
-async function displayActiveChallenge() {
-
-  var apiKey = "a6c77a7dcc274176a32b89dea767f651";
-  //apiKey: "739a15dee8b84c5187535bfa56e19ccb"
-  //apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
-  //af8d927cc09d4e718de7f8b37b6faec8
-  //a7d1f5efe8b44415b138d80f9e6f8bfc
-  //a6c77a7dcc274176a32b89dea767f651
-  //cdbd83399ef34b0d9cd4c87cc449e092
-  //da4f4319aef647f2b661181013f1042f
-
-  if (userActiveChallenge.value != "") {
-
-    var url = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/information?includeNutrition=false&apiKey=" + apiKey
-
-    axios.get(url)
-      .then(response => {
-        console.log(response.data);
-        recipeTitle.value = response.data.title
-        recipeImg.value = response.data.image
-        servings.value = response.data.servings
-        timeTaken.value = response.data.readyInMinutes
-        description.value = response.data.summary
-        if (response.data.analyzedInstructions.length > 0) {
-          // console.log("testing")
-          recipeScore.value = (response.data.analyzedInstructions[0].steps).length * response.data.readyInMinutes
-          steps.value = response.data.analyzedInstructions[0].steps
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          this.userName = userData.name;
+          this.userEmail = userData.email;
+          this.userPoints = userData.points;
+          this.userStreak = userData.streak;
+          this.userActiveChallenge = userData.activeChallenge;
+          this.documentId = uid;
+          this.displayActiveChallenge();
+        } else {
+          console.log('No such document!');
         }
-        else {
-          // console.log("no instruction")
-          recipeScore.value = response.data.readyInMinutes
+      } catch (e) {
+        console.error('Error getting user document:', e);
+      }
+    },
+    async displayActiveChallenge() {
+      if (this.userActiveChallenge) {
+        const baseUrl = "https://api.spoonacular.com/recipes";
+        const apiKey = "739a15dee8b84c5187535bfa56e19ccb";
+      //   apiKey: "739a15dee8b84c5187535bfa56e19ccb",
+      // apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
+      // apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
+      // apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
+      // apikey: "32c5a4b096014b22957dc323d87d263f",
+
+        try {
+          const recipeResponse = await axios.get(`${baseUrl}/${this.userActiveChallenge}/information`, {
+            params: { includeNutrition: false, apiKey }
+          });
+          const { data: recipeData } = recipeResponse;
+          this.recipeTitle = recipeData.title;
+          this.recipeImg = recipeData.image;
+          this.description = recipeData.summary;
+          this.servings = recipeData.servings
+          this.timeTaken = recipeData.readyInMinutes
+          this.recipeScore = recipeData.analyzedInstructions.length > 0
+            ? recipeData.analyzedInstructions[0].steps.length * recipeData.readyInMinutes
+            : recipeData.readyInMinutes;
+          this.steps = recipeData.analyzedInstructions[0]?.steps || [];
+
+          const ingredientsResponse = await axios.get(`${baseUrl}/${this.userActiveChallenge}/ingredientWidget.json`, {
+            params: { apiKey }
+          });
+          this.ingredients = ingredientsResponse.data.ingredients;
+
+          const nutritionResponse = await axios.get(`${baseUrl}/${this.userActiveChallenge}/nutritionWidget.json`, {
+            params: { apiKey }
+          });
+          const nutrition = nutritionResponse.data;
+          this.calories = nutrition.calories;
+          this.carbs = nutrition.carbs;
+          this.fat = nutrition.fat;
+          this.protein = nutrition.protein;
+        } catch (error) {
+          console.error('Error fetching recipe data:', error.message);
         }
+      }
+    },
+    onFileChange(event) {
+      this.file = event.target.files[0];
+    },
+    async completeAndUploadChallenge() {
+      const user = getAuth().currentUser;
 
-      })
-      .catch(error => {
-        console.log(error.message);
-      });
+      if (!this.file || !this.caption) {
+        alert('Please select a challenge, choose a file, and add a caption before completing.');
+        return;
+      }
 
-      var ingredientUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json?apiKey=" + apiKey
-      axios.get(ingredientUrl)
-      .then(response => {
-        ingredients.value = response.data.ingredients;
-      })
-      .catch(error => {
-        console.log(error.message);
-      });
+      this.isLoading = true; // Start loading
+      try {
+        const postsCollectionRef = collection(db, 'posts');
+        const postDocRef = await addDoc(postsCollectionRef, {
+          challengeName: this.recipeTitle,
+          challengeScore: this.recipeScore,
+          userId: user.uid,
+          likes: 0,
+          caption: this.caption,
+          timestamp: serverTimestamp(),
+          likedBy: []
+        });
 
+        const documentId = postDocRef.id;
+        const fileRef = storageRef(storage, `uploads/${user.uid}/${documentId}`);
+        await uploadBytes(fileRef, this.file);
+        const url = await getDownloadURL(fileRef);
 
-      var nutritionUrl = "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json?apiKey=" + apiKey
+        if (user) {
+          const userDocRef = doc(db, 'user', user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            this.currentScore = Number(userData.points);
+          }
 
-      axios.get(nutritionUrl)
-      .then(response => {
-        calories.value = response.data.calories
-        carbs.value = response.data.carbs
-        fat.value = response.data.fat
-        protein.value = response.data.protein
-
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.log(error.message);
-      });
-
-    // https://api.spoonacular.com/recipes/1003464/ingredientWidget.json?apiKey=739a15dee8b84c5187535bfa56e19ccb
-    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/ingredientWidget.json"
-    // "https://api.spoonacular.com/recipes/" + userActiveChallenge.value + "/nutritionWidget.json"
-
-  }
-}
-
-// Function to complete challenge and redirect
-function completeChallenge() {
-  if (userActiveChallenge.value) {
-    router.push({ name: 'Social' }); // Redirect to Social page by name
-  } else {
-    alert('No active challenge to complete.');
-  }
-}
-
-// Authentication check on component mount
-onMounted(() => {
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      const uid = user.uid;
-      getUserData(uid);
+          await updateDoc(userDocRef, {
+            points: this.currentScore + Number(this.recipeScore),
+            activeChallenge: '' // Clear the active challenge after completion
+          });
+          
+           // Show toast message
+          this.toastMessage = `Challenge completed successfully! You have obtained ${this.recipeScore} points.`;
+          this.showBootstrapToast();
+          this.closeModal()
+          // Hide toast after a few seconds
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
+        } else {
+          alert('User not authenticated.');
+        }
+      } catch (error) {
+        console.error('Error completing challenge or uploading file:', error);
+        alert('Failed to complete challenge. Please try again.');
+      } finally {
+        this.isLoading = false; // End loading
+      }
+    },
+    showBootstrapToast() {
+      const toastEl = this.$refs.toastRef;
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
     }
-  });
-});
 
-
-// // Function to add ingredient
-// async function addIngredient() {
-//   if (documentId.value) {
-//     try {
-//       const docRef = doc(db, "ingredients", documentId.value);
-//       await updateDoc(docRef, {
-//         ingredient: arrayUnion(ingredient.value)
-//       });
-//       console.log("Ingredient added: ", ingredient.value);
-//     } catch (e) {
-//       console.error("Error adding ingredient: ", e);
-//     }
-//   } else {
-//     console.error("No document ID found.");
-//   }
-// }
-
-
+  },
+  mounted() {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push('/login');
+      } else {
+        const uid = user.uid;
+        this.getUserData(uid);
+      }
+    });
+  },
+};
 </script>
 
 <template>
@@ -171,7 +201,7 @@ onMounted(() => {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<div v-if="userActiveChallenge">
   <section class="page row">
     <section class="heading">
       <h1>Active Challenge</h1>
@@ -253,6 +283,47 @@ onMounted(() => {
         </div>
       </div>
     </section>
+    <div>
+    <button
+        class="open-modal-button"
+        @click="openModal">
+        Open Modal
+      </button>
+    </div>
+  </div>
+
+    <!-- Show this message when userActiveChallenge is empty -->
+    <div v-else class="no-challenge-message">
+      <p>No active challenge! <router-link to="/start" class="get-cooking-link">Get to cooking!</router-link></p>
+    </div>
+
+    <!-- Modal -->
+    <div v-if="isModalVisible" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <p>Challenge: {{ recipeTitle }}</p>
+        <input type="file" @change="onFileChange" />
+        <input type="text" v-model="caption" placeholder="Add a caption" />
+        <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
+        Challenge Complete
+      </button>
+      </div>
+    </div>
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Loading, please wait...</p>
+    </div>
+        <!-- Toast Notification -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" ref="toastRef">
+        <div class="toast-header">
+          <strong class="me-auto">Challenge Completed!</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
+      </div>
+    </div>
 </template>
 
 <style scoped>
@@ -468,4 +539,128 @@ onMounted(() => {
     text-align: center;
     margin-bottom: 40px;
   }
+  .no-challenge-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh; /* Ensures it takes up a good portion of the viewport */
+  text-align: center;
+  font-size: 1.5em;
+  color: #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Lower z-index than loading overlay */
+  overflow: hidden;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%; /* Width set to 80% of viewport */
+  max-width: 700px; /* Max width to ensure responsiveness */
+  height: 80vh; /* Height set to 80% of viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+/* Loading Overlay (Higher z-index to overlay modal) */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 2000; /* Higher than modal overlay */
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #ffffff;
+  border-top: 5px solid #ff9d65;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.modal-content ul {
+  list-style-type: none;
+  padding: 0; 
+  margin: 10px 0; 
+  text-align: center; 
+  width: 100%; 
+}
+.modal-content ul li {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0; 
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.modal-content button {
+  background-color: #ff9d65;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.modal-content button:hover {
+  background-color: #ff7f3a;
+}
+.open-modal-button {
+  background-color: #ff9d65;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+.open-modal-button:hover {
+  background-color: #ff7f3a;
+}
+.modal-content button:disabled {
+  background-color: #ffccaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 </style>
