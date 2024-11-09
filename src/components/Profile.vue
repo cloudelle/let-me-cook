@@ -156,12 +156,11 @@ export default {
            // Show toast message
           this.toastMessage = `Challenge completed successfully! You have obtained ${this.recipeScore} points.`;
           this.showBootstrapToast();
-
+          this.closeModal()
           // Hide toast after a few seconds
           setTimeout(() => {
-            this.showToast = false;
+            location.reload();
           }, 3000);
-          this.closeModal()
         } else {
           alert('User not authenticated.');
         }
