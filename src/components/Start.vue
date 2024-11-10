@@ -137,10 +137,10 @@ export default {
       suggestedIngredients: [], // API suggested ingredients
       fetchIngredientsTimer: null, // Timer for debouncing
       // apiKey: "739a15dee8b84c5187535bfa56e19ccb",
-      apiKey: "da4f4319aef647f2b661181013f1042f",
+      // apiKey: "da4f4319aef647f2b661181013f1042f",
     //  apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       // apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
-      // apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
+      apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
       // apikey: "32c5a4b096014b22957dc323d87d263f",
       numberOfRecipes: 10, // Number of recipes to display
       recipes: [],
@@ -164,11 +164,13 @@ export default {
     openModal(recipe) {
       this.selectedRecipe = recipe;
       this.isModalVisible = true;
+      document.body.style.overflow = 'hidden'; 
     },
     // Close modal and clear selected recipe
     closeModal() {
       this.isModalVisible = false;
       this.selectedRecipe = {};
+      document.body.style.overflow = '';
     },
     showToast() {
       if (this.toast) {
@@ -575,14 +577,14 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  overflow: hidden;
+  overflow: hidden; /* Prevent any scrolling on the overlay itself */
 }
 
 .modal-content {
@@ -590,10 +592,12 @@ button {
   padding: 20px;
   border-radius: 8px;
   width: 500px;
+  padding-right: 15px;
   max-width: 80%;
   max-height: 80vh;
-  overflow-y: auto;
-  text-align: left; 
+  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  text-align: left;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
   font-family: "Outfit", sans-serif;
 }
