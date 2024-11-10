@@ -81,7 +81,8 @@ export default {
       //const apiKey = "af8d927cc09d4e718de7f8b37b6faec8"
       //const apiKey = "f22b8ffb2f4f476fb33831a32e903b77"
       //const apiKey = "32c5a4b096014b22957dc323d87d263f"
-      const apiKey = "afbc0b914dc54eafa85c4f030283b3bf";
+      // const apiKey = "afbc0b914dc54eafa85c4f030283b3bf";
+      const apiKey = "c6abfc3fa25d4cc6be64c51124da28b9";
 
         try {
           const recipeResponse = await axios.get(`${baseUrl}/${this.userActiveChallenge}/information`, {

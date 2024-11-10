@@ -141,7 +141,8 @@ export default {
     //  apiKey: "f88baf2ecf9a4eab92a25613785c4ba1",
       // apiKey: "af8d927cc09d4e718de7f8b37b6faec8",
       // apiKey: "f22b8ffb2f4f476fb33831a32e903b77",
-      apiKey: "afbc0b914dc54eafa85c4f030283b3bf",
+      // apiKey: "afbc0b914dc54eafa85c4f030283b3bf",
+      apiKey: 'c6abfc3fa25d4cc6be64c51124da28b9',
       // apikey: "32c5a4b096014b22957dc323d87d263f",
       numberOfRecipes: 10, // Number of recipes to display
       recipes: [],
