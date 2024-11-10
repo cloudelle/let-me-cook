@@ -57,7 +57,7 @@ export const register = (event) => {
             var authUid = getAuth().lastNotifiedUid
             addUserInfo(authUid)
             addIngredientsList(authUid)
-            router.push('/login')
+            router.push('/')
         })
         .catch((error) => {
             alert(error.message)
