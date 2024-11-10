@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../firebase.js';
-import router from '../router';
+import router from '../router/index.js';
 import { ref, onMounted } from 'vue';
 import { collection, orderBy, addDoc, doc, getDoc, updateDoc, query, getDocs, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -115,14 +115,29 @@ export default {
         }
       }
     },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
     onFileChange(event) {
-      this.file = event.target.files[0];
+      const file = event.target.files[0];
+      this.validateAndSetFile(file);
+    },
+    handleDrop(event) {
+      const file = event.dataTransfer.files[0];
+      this.validateAndSetFile(file);
+    },
+    validateAndSetFile(file) {
+      if (file && file.type.startsWith("image/")) {
+        this.file = file;
+      } else {
+        alert("Please select a valid image file.");
+      }
     },
     async completeAndUploadChallenge() {
       const user = getAuth().currentUser;
 
       if (!this.file || !this.caption) {
-        alert('Please select a challenge, choose a file, and add a caption before completing.');
+        alert('Please choose a file, and add a caption before completing.');
         return;
       }
 
@@ -283,13 +298,11 @@ export default {
         </div>
       </div>
     </section>
-    <div>
-    <button
-        class="open-modal-button"
-        @click="openModal">
-        Open Modal
-      </button>
-    </div>
+    <div class="centered-upload-trigger">
+    <button @click="openModal" class="open-modal-button">
+      Upload Your Image
+    </button>
+  </div>
   </div>
 
     <!-- Show this message when userActiveChallenge is empty -->
@@ -300,17 +313,41 @@ export default {
     <!-- Modal -->
     <div v-if="isModalVisible" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
-        <p>Challenge: {{ recipeTitle }}</p>
-        <input type="file" @change="onFileChange" />
-        <input type="text" v-model="caption" placeholder="Add a caption" />
-        <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
-        Challenge Complete
+        <p>Challenge: <span style="font-weight: bold;">{{ recipeTitle }}</span></p>
+        <p>Score: <span style="font-weight: bold;"> {{recipeScore}}</span></p>
+      <!-- Drag and Drop Area with Icon -->
+      <div
+        @dragover.prevent
+        @drop.prevent="handleDrop"
+        @click="triggerFileInput"
+        class="drop-zone border border-secondary rounded p-4 text-center"
+      >
+        <input
+          type="file"
+          @change="onFileChange"
+          ref="fileInput"
+          class="file-input"
+          accept="image/*"
+        />
+        <div v-if="file">
+          <i class="fa fa-check-circle fa-3x text-success"></i>
+        <p class="mt-2">File selected: {{ file.name }}</p>
+      </div>
+      <div v-else>
+        <i class="fa fa-cloud-upload-alt fa-3x text-secondary upload-icon"></i>
+        <p class="mt-2">Drag and drop an image file here, or click to select</p>
+      </div>
+      </div>
+      <input
+        type="text" v-model="caption" placeholder="Add a catchy caption for your image..." class="form-control mt-3 caption-input" />
+        <button @click="completeAndUploadChallenge" :disabled="!file || !caption" class="upload-button btn btn-primary mt-3">
+        Post your cooking!
       </button>
       </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
       <div class="loading-spinner"></div>
-      <p>Loading, please wait...</p>
+      <p>We are cooking, please wait...</p>
     </div>
         <!-- Toast Notification -->
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -563,7 +600,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Lower z-index than loading overlay */
+  z-index: 1000;
   overflow: hidden;
 }
 
@@ -571,14 +608,42 @@ export default {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 80%; /* Width set to 80% of viewport */
-  max-width: 700px; /* Max width to ensure responsiveness */
-  height: 80vh; /* Height set to 80% of viewport */
-  overflow-y: auto; /* Enable vertical scrolling */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  width: 80%;
+  max-width: 700px;
   text-align: center;
 }
 
+.drop-zone {
+  cursor: pointer;
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.drop-zone:hover {
+  border-color: #ff9d65;
+}
+
+.file-input {
+  display: none; 
+}
+ 
+.text-success {
+  color: #28a745; /* Success green color */
+}
+
+.upload-icon {
+  color: #ff9d65;
+  transition: color 0.3s;
+}
+
+.upload-icon:hover {
+  color: #ff7f3a;
+}
 /* Loading Overlay (Higher z-index to overlay modal) */
 .loading-overlay {
   position: fixed;
@@ -659,6 +724,32 @@ export default {
   background-color: #ff7f3a;
 }
 .modal-content button:disabled {
+  background-color: #ffccaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.centered-upload-trigger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px;
+}
+.upload-button {
+  background-color: #ff9d65;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #ff7f3a;
+}
+
+.upload-button:disabled {
   background-color: #ffccaa;
   cursor: not-allowed;
   opacity: 0.6;

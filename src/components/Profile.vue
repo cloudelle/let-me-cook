@@ -202,7 +202,6 @@ export default {
   </div>
 </template>
 
-<!-- this has been gpt-ed just so i can see the pics better feel free to delete -->
 <style scoped>
 .posts-container {
   display: flex;
