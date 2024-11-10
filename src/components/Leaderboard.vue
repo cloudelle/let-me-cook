@@ -61,7 +61,7 @@
             </div>
 
             <!-- Table Rows with Alternating Colors -->
-            <div v-for="(user, index) in users.slice(5)" :key="user.ingredientId" :class="[
+            <div v-for="(user, index) in users.slice(5,15)" :key="user.ingredientId" :class="[
                 'table-row grid grid-cols-3 gap-4 p-4 rounded-lg mb-2 text-center shadow-md',
                 index % 2 === 0 ? 'bg-red-300 text-gray-800' : 'bg-red-400 text-white'
             ]">
