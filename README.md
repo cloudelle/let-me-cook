@@ -1,7 +1,7 @@
 # LET ME COOK
-URL: 
+URL: https://let-me-cook-a6cd6.web.app/
 
-GitHub Repository: 
+GitHub Repository: https://github.com/cloudelle/let-me-cook.git
 
 # Description
 Let Me Cook is a recipe management application developed using Vue 3 and Vite framework, hosted on Firebase. This webapp helps promotes cooking in households by providing a gamified cooking experience!
@@ -27,9 +27,19 @@ Node.js (version 14 or later)
 
 This will run the webapp in your localhost
 
+# Deploying to cloud(firebase)
+
+1)  ```git clone https://github.com/cloudelle/let-me-cook.git```
+2)  ```cd let-me-cook```
+3) ```firebase login```
+4) ```firebase deploy```
+
 
 # Credentials
 **If required:**
 
-Username:
-Password:
+Note! This is a test account for the features
+
+Username: test@gmail.com
+
+Password: qwerty123
