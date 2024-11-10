@@ -106,8 +106,7 @@ import { useAuth } from '../composables/useAuth.js';
         <li v-for="(steps,idx) in stepsIngredient" :key="idx">{{ (idx+1) + ") " + steps.name.charAt(0).toUpperCase() + steps.name.slice(1)}}</li>
       </ul>
       <button @click="closeModal" style="background-color:rgb(255, 157, 101); font-weight: 700;">Close</button>
-      <button @click="addChallenge(selectedRecipe)" style="background-color:rgb(255, 157, 101); font-weight: 700;">START
-        CHALLENGE!</button>
+      <button @click="addChallenge(selectedRecipe)" style="background-color:#cc7e51; font-weight: 700;">Start Challenge!</button>
     </div>
   </div>
 
