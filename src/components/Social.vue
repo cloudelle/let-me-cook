@@ -1,52 +1,61 @@
-<template>
-  <!-- <div> -->
-    <!-- jewels new code starts here -->
-    <!-- Display recipe title instead of challenge ID -->
-    <!-- <p v-if="recipeTitle">Challenge: {{ recipeTitle }}</p>
+<!-- <div> -->
+<!-- jewels new code starts here -->
+<!-- Display recipe title instead of challenge ID -->
+<!-- <p v-if="recipeTitle">Challenge: {{ recipeTitle }}</p>
 
       File upload and caption input -->
-    <!-- <div v-if="selectedChallenge">
+<!-- <div v-if="selectedChallenge">
       <input type="file" @change="onFileChange" />
       <input type="text" v-model="caption" placeholder="Add a caption" /> -->
 
-      <!-- Combined "Challenge Complete" button -->
-      <!-- <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
+<!-- Combined "Challenge Complete" button -->
+<!-- <button @click="completeAndUploadChallenge" :disabled="!file || !caption">
         Challenge Complete
       </button>
     </div>
   </div> -->
-
+<template>
   <div class="posts-container">
-    <h1>Posts</h1>
+    <h2 id="dynamic-title"></h2>
 
-    <!-- Loop through each post and display its details inside a card -->
-    <div v-for="displayPost in displayPosts" :key="displayPost.id" >
+    <!-- Loop through each post and display its details -->
+    <div v-for="displayPost in displayPosts" :key="displayPost.id">
       <div v-if="displayPost.userId != this.userid" class="post-card">
-        <!-- Display Name and Formatted Timestamp at the Top -->
+        <!-- Post Header with Placeholder Avatar and Name -->
         <div class="post-header">
-          <h3>{{ displayPost.name }}</h3>
-          <span>{{ formatTimestamp(displayPost.timestamp) }}</span>
+          <div class="user-avatar">
+            {{ displayPost.name.charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <h5 class="username m-0">{{ displayPost.name }}</h5>
+            <span class="timestamp">{{ formatTimestamp(displayPost.timestamp) }}</span>
+          </div>
         </div>
 
-        <!-- Display Image in the Middle -->
+        <!-- Single Image Display -->
         <div class="post-image">
-          <img :src="displayPost.imageUrl" alt="Post Image" height="400px" width="400px" />
+          <img :src="displayPost.imageUrl" alt="Post Image" class="single-post-image" />
         </div>
 
-        <!-- Display Challenge Name, Caption, Likes, and Score Below -->
+        <!-- Post Details including Challenge Name, Caption, Score, and Likes -->
         <div class="post-details">
-          <h4>{{ displayPost.challengeName }}</h4>
-          <p> <strong>Caption:</strong>{{ displayPost.caption }}</p>
-          <p><strong>Likes:</strong> {{ displayPost.likes }}</p>
-          <p><strong>Challenge Score:</strong> {{ displayPost.challengeScore }}</p>
+          <h4 class="challenge-name">{{ displayPost.challengeName }}</h4>
+          <p class="caption">{{ displayPost.caption }}</p>
+
+          <!-- Score and Likes Row -->
+          <div class="score-likes-row">
+            <p class="challenge-score"><strong>Score:</strong> {{ displayPost.challengeScore }}</p>
+            <button @click="likePost(displayPost)" class="like-button">
+              <i :class="[displayPost.isLikedByUser ? 'fas fa-heart liked' : 'far fa-heart']"></i>
+              {{ displayPost.likes }} Likes
+            </button>
+          </div>
         </div>
-        <button v-if="displayPost.userId != this.userid" @click="likePost(displayPost)">
-          {{ displayPost.isLikedByUser ? 'Unlike' : 'Like' }}
-        </button>
       </div>
     </div>
   </div>
 </template>
+
 <!-- jewels new code ends here -->
 <script>
 import { ref, onMounted } from 'vue';
@@ -55,6 +64,7 @@ import { collection, orderBy, addDoc, doc, getDoc, updateDoc, query, getDocs, se
 import axios from 'axios';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase';
+import TypeIt from 'typeit';
 
 // jewels new codes start here
 export default {
@@ -78,8 +88,8 @@ export default {
   },
   methods: {
     formatTimestamp(timestamp) {
-      const date = new Date(timestamp.seconds * 1000);  
-      return date.toLocaleString(); 
+      const date = new Date(timestamp.seconds * 1000);
+      return date.toLocaleString();
     },
 
     async likePost(displayPost) {
@@ -149,8 +159,8 @@ export default {
           const imageUrl = await getDownloadURL(imageRef);
 
           return {
-            id: postId,    
-            ...postData,      
+            id: postId,
+            ...postData,
             imageUrl,
             isLikedByUser: postData.likedBy && postData.likedBy.includes(this.userid) // Check if user liked the post               // Add the image URL to the post data
           };
@@ -177,8 +187,8 @@ export default {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             return {
-              ...post,      
-              name: userData.name 
+              ...post,
+              name: userData.name
             };
           } else {
             console.warn(`User not found for userId: ${post.userId}`);
@@ -190,7 +200,7 @@ export default {
       console.log('Posts with usernames:', postsWithUsernames);
       this.displayPosts = postsWithUsernames;
     },
-// jewels new codes end here
+    // jewels new codes end here
 
     // onFileChange(event) {
     //   this.file = event.target.files[0];
@@ -294,44 +304,174 @@ export default {
       }
     });
   },
+  name: 'SocialPage',
+  setup() {
+    // Initialize TypeIt on component mount
+    onMounted(() => {
+      new TypeIt("#dynamic-title", {
+        strings: ["Welcome to Your Feed", "Discover New Challenges!"],
+        speed: 100,
+        breakLines: false,
+        loop: true,
+      }).go();
+    });
+  },
 };
 </script>
 
-
-<!-- this has been gpt-ed just so i can see the pics better feel free to delete -->
 <style scoped>
+#dynamic-title {
+  font-size: 2.5em;
+  text-align: center;
+  color: #ff4500;
+  font-family: 'VT323', monospace;
+  margin-bottom: 2q0px;
+}
+
 .posts-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 20px;
+  background: linear-gradient(to bottom right, #f9f9f9, #e0e0e0);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.social-title {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #ff6347;
+  font-family: 'VT323', monospace;
 }
 
 .post-card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 450px;
+  background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
   padding: 20px;
-  margin: 20px 0;
-  text-align: center;
+  margin-bottom: 20px;
+  transition: transform 0.3s;
+}
+
+.post-card:hover {
+  transform: translateY(-10px);
 }
 
 .post-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-.post-image img {
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ff6347;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.username {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.post-image {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.single-post-image {
   width: 100%;
   height: auto;
-  border-radius: 8px;
-  margin: 10px 0;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
 .post-details {
   margin-top: 10px;
+  text-align: left;
+}
+
+.challenge-name {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.caption {
+  font-size: 1em;
+  color: #555;
+}
+
+.challenge-score {
+  font-size: 1em;
+  color: #ff6347;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.likes-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  font-size: 1.1em;
+  color: #ff6347;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.like-button .fa-heart {
+  margin-right: 5px;
+  transition: transform 0.2s;
+}
+
+.like-button .liked {
+  color: #ff6347;
+  transform: scale(1.2);
+  animation: pop 0.2s ease-in-out;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.score-likes-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 }
 </style>
-<!-- this has been gpt-ed just so i can see the pics better feel free to delete -->

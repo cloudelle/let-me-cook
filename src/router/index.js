@@ -14,7 +14,6 @@ const routes = [
     path: "/",
     name: "About",
     component: About,
-    meta: { requiresAuth: true }, // Protect this route
   },
   {
     path: "/register",
