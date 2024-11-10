@@ -265,7 +265,7 @@ export default {
       }
     },
     fetchRecipes() {
-      const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${this.numberOfRecipes}&addRecipeInformation=true&addRecipeInstructions=true&includeIngredients=${this.selectedIngredients.join(',')}&addRecipeNutrition=true&apiKey=${this.apiKey}`
+      const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${this.numberOfRecipes}&addRecipeInformation=true&addRecipeInstructions=true&includeIngredients=${this.selectedIngredients.join(',')}&addRecipeNutrition=true&instructionsRequired=true&apiKey=${this.apiKey}`;
       axios.get(apiUrl)
         .then(response => {
           this.recipes = response.data.results
@@ -590,42 +590,73 @@ button {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 400px;
+  width: 500px;
   max-width: 80%;
   max-height: 80vh;
   overflow-y: auto;
+  text-align: left; 
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: "Outfit", sans-serif;
+}
+
+/* Title styling */
+.modal-content h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff9d65; 
+  margin-bottom: 10px;
   text-align: center;
-}
-.modal-content ul {
-  list-style-type: none;
-  padding: 0; 
-  margin: 10px 0; 
-  text-align: center; 
-  width: 100%; 
-}
-.modal-content ul li {
-  display: flex;
-  justify-content: center;
-  margin: 5px 0; 
 }
 
 .modal-content img {
   width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 16px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
+/* Nutritional information styling */
+.modal-content p {
+  font-size: 16px;
+  color: #555;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Ingredients list styling */
+.modal-content ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.modal-content ul li {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0; 
+}
+
+/* Button styling */
 .modal-content button {
-  background-color: #333;
+  background-color: #ff9d65; 
   color: white;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 10px 5px;
+  width: 100%;
 }
 
 .modal-content button:hover {
-  background-color: #555;
+  background-color: #ff7f3a;
 }
 </style>
