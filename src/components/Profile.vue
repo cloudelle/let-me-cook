@@ -109,38 +109,37 @@ export default {
         console.error("Error updating caption:", error);
       }
     },
-    // oi who did this, alrdy got one func above -- ziq 
-    // async deletePost(postInfo) {
-    //   this.deletePostId = postInfo.id;
-    //   console.log(this.deletePostId, this.userid);
+    async deletePost(postInfo) {
+      this.deletePostId = postInfo.id;
+      console.log(this.deletePostId, this.userid);
 
-    //   // Display a confirmation dialog before deleting
-    //   const userConfirmed = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
+      // Display a confirmation dialog before deleting
+      const userConfirmed = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
 
-    //   if (!userConfirmed) {
-    //     // If the user cancels, exit the function
-    //     return;
-    //   }
+      if (!userConfirmed) {
+        // If the user cancels, exit the function
+        return;
+      }
 
-    //   try {
-    //     // Delete the post document from Firestore
-    //     const postRef = doc(db, 'posts', this.deletePostId);
-    //     await deleteDoc(postRef);
+      try {
+        // Delete the post document from Firestore
+        const postRef = doc(db, 'posts', this.deletePostId);
+        await deleteDoc(postRef);
 
-    //     // Delete the image from storage
-    //     const imageUrl = postInfo.imageUrl;
-    //     const url = new URL(imageUrl);
-    //     const imagePath = decodeURIComponent(url.pathname.split('/o/')[1]);
-    //     const storage = getStorage();
-    //     const imageRef = storageRef(storage, imagePath);
-    //     await deleteObject(imageRef);
+        // Delete the image from storage
+        const imageUrl = postInfo.imageUrl;
+        const url = new URL(imageUrl);
+        const imagePath = decodeURIComponent(url.pathname.split('/o/')[1]);
+        const storage = getStorage();
+        const imageRef = storageRef(storage, imagePath);
+        await deleteObject(imageRef);
 
-    //     location.reload();
-    //     console.log("Image deleted from Firebase Storage.");
-    //   } catch (error) {
-    //     console.error("Error deleting post or image:", error);
-    //   }
-    // },
+        location.reload();
+        console.log("Image deleted from Firebase Storage.");
+      } catch (error) {
+        console.error("Error deleting post or image:", error);
+      }
+    },
     formatTimestamp(timestamp) {
       const date = new Date(timestamp.seconds * 1000); // Convert seconds to milliseconds
       return date.toLocaleString(); // Convert to readable date string
