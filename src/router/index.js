@@ -61,8 +61,15 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition; // Return to the saved scroll position if available (e.g., back/forward)
+    } else {
+      return { top: 0 }; // Always scroll to the top of the page on navigation
+    }
+  },
+});
 // Route guard to check authentication
 router.beforeEach((to, from, next) => {
   const auth = getAuth();

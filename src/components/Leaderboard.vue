@@ -83,7 +83,7 @@ export default {
     name: 'Leaderboard',
     setup() {
         const users = ref([]);
-        const stopConfetti = ref(false);
+        // const stopConfetti = ref(false);
         let maxPoints = ref(0);
 
         // Fetch users from Firestore and sort by points
@@ -103,9 +103,9 @@ export default {
                 maxPoints.value = Math.max(...users.value.slice(0, 5).map(user => user.points));
 
                 // Trigger confetti animation for the top user
-                if (users.value.length > 0) {
-                    launchConfetti();
-                }
+                // if (users.value.length > 0) {
+                //     launchConfetti();
+                // }
             } catch (error) {
                 console.error('Error fetching users:', error);
             }

@@ -74,7 +74,7 @@ export default {
         await deleteObject(imageRef);
 
         this.closeDeleteModal();
-        location.reload();
+        await this.fetchPosts()
         console.log("Post successfully deleted.");
       } catch (error) {
         console.error("Error deleting post or image:", error);
@@ -88,6 +88,9 @@ export default {
       this.activeMenu = null;
     },
     async saveCaption() {
+      if (!this.newCaption.trim()) {
+      return;
+    }
       if (!this.editPost) return;
 
       try {
@@ -106,37 +109,38 @@ export default {
         console.error("Error updating caption:", error);
       }
     },
-    async deletePost(postInfo) {
-      this.deletePostId = postInfo.id;
-      console.log(this.deletePostId, this.userid);
+    // oi who did this, alrdy got one func above -- ziq 
+    // async deletePost(postInfo) {
+    //   this.deletePostId = postInfo.id;
+    //   console.log(this.deletePostId, this.userid);
 
-      // Display a confirmation dialog before deleting
-      const userConfirmed = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
+    //   // Display a confirmation dialog before deleting
+    //   const userConfirmed = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
 
-      if (!userConfirmed) {
-        // If the user cancels, exit the function
-        return;
-      }
+    //   if (!userConfirmed) {
+    //     // If the user cancels, exit the function
+    //     return;
+    //   }
 
-      try {
-        // Delete the post document from Firestore
-        const postRef = doc(db, 'posts', this.deletePostId);
-        await deleteDoc(postRef);
+    //   try {
+    //     // Delete the post document from Firestore
+    //     const postRef = doc(db, 'posts', this.deletePostId);
+    //     await deleteDoc(postRef);
 
-        // Delete the image from storage
-        const imageUrl = postInfo.imageUrl;
-        const url = new URL(imageUrl);
-        const imagePath = decodeURIComponent(url.pathname.split('/o/')[1]);
-        const storage = getStorage();
-        const imageRef = storageRef(storage, imagePath);
-        await deleteObject(imageRef);
+    //     // Delete the image from storage
+    //     const imageUrl = postInfo.imageUrl;
+    //     const url = new URL(imageUrl);
+    //     const imagePath = decodeURIComponent(url.pathname.split('/o/')[1]);
+    //     const storage = getStorage();
+    //     const imageRef = storageRef(storage, imagePath);
+    //     await deleteObject(imageRef);
 
-        location.reload();
-        console.log("Image deleted from Firebase Storage.");
-      } catch (error) {
-        console.error("Error deleting post or image:", error);
-      }
-    },
+    //     location.reload();
+    //     console.log("Image deleted from Firebase Storage.");
+    //   } catch (error) {
+    //     console.error("Error deleting post or image:", error);
+    //   }
+    // },
     formatTimestamp(timestamp) {
       const date = new Date(timestamp.seconds * 1000); // Convert seconds to milliseconds
       return date.toLocaleString(); // Convert to readable date string
@@ -301,10 +305,10 @@ export default {
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content">
         <h3>Edit Caption</h3>
-        <input type="text" v-model="newCaption" placeholder="Enter new caption" class="modal-input" />
+        <input type="text" v-model="newCaption" placeholder="Enter new caption" class="modal-input" @keyup.enter="saveCaption" />
         <div class="modal-buttons">
           <button @click="closeModal" class="modal-cancel-button">Cancel</button>
-          <button @click="saveCaption" class="modal-save-button">Save</button>
+          <button @click="saveCaption" class="modal-save-button" :disabled="!newCaption.trim()">Save</button>
         </div>
       </div>
     </div>
@@ -548,5 +552,11 @@ export default {
 .modal-save-button:hover,
 .modal-cancel-button:hover {
   transform: scale(1.05);
+}
+
+.modal-save-button:disabled {
+  background-color: #ffccaa; /* Lightened color for disabled state */
+  cursor: not-allowed;
+  opacity: 0.6; /* Slightly faded to show it's disabled */
 }
 </style>

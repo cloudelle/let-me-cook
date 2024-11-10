@@ -8,7 +8,7 @@ const router = useRouter(); // Initialize the router
 
 // API key and URL for Spoonacular API
 //const apiKey = "739a15dee8b84c5187535bfa56e19ccb"; // Your actual Spoonacular API key f88baf2ecf9a4eab92a25613785c4ba1
-const apiKey = "f22b8ffb2f4f476fb33831a32e903b77";
+const apiKey = "afbc0b914dc54eafa85c4f030283b3bf";
 const numberOfRecipes = 6; // Number of recipes to display
 const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?sort=popularity&number=${numberOfRecipes}&addRecipeInformation=true&apiKey=${apiKey}`;
 

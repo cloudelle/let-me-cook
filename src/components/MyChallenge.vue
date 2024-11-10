@@ -75,12 +75,13 @@ export default {
     async displayActiveChallenge() {
       if (this.userActiveChallenge) {
         const baseUrl = "https://api.spoonacular.com/recipes";
-        const apiKey = "f22b8ffb2f4f476fb33831a32e903b77";
+        // const apiKey = "f22b8ffb2f4f476fb33831a32e903b77";
       //const apiKey = "739a15dee8b84c5187535bfa56e19ccb"
       //const apiKey = "f88baf2ecf9a4eab92a25613785c4ba1"
       //const apiKey = "af8d927cc09d4e718de7f8b37b6faec8"
       //const apiKey = "f22b8ffb2f4f476fb33831a32e903b77"
       //const apiKey = "32c5a4b096014b22957dc323d87d263f"
+      const apiKey = "afbc0b914dc54eafa85c4f030283b3bf";
 
         try {
           const recipeResponse = await axios.get(`${baseUrl}/${this.userActiveChallenge}/information`, {
@@ -178,8 +179,8 @@ export default {
           this.closeModal()
           // Hide toast after a few seconds
           setTimeout(() => {
-            location.reload();
-          }, 3000);
+            this.$router.replace('/profile');
+          }, 2500);
         } else {
           alert('User not authenticated.');
         }
@@ -339,7 +340,7 @@ export default {
       </div>
       </div>
       <input
-        type="text" v-model="caption" placeholder="Add a catchy caption for your image..." class="form-control mt-3 caption-input" />
+        type="text" v-model="caption" placeholder="Add a catchy caption for your image..." class="form-control mt-3 caption-input" @keyup.enter="completeAndUploadChallenge" :disabled="!file" />
         <button @click="completeAndUploadChallenge" :disabled="!file || !caption" class="upload-button btn btn-primary mt-3">
         Post your cooking!
       </button>
